@@ -18,6 +18,31 @@ public:
     Ray();
     Ray(const Ray &r);
     Ray(const Point3 &origin, const Vector3 &direction, float maxDist = MAX_RAY_DIST);
+
+    Point3 calculate(float t) const;
+
+    Point3 getOrigin() const;
+    Vector3 getDirection() const;
+    float getMaxDist() const;
+
+    void setOrigin(Point3 newOrigin);
+    void setDirection(Vector3 newDirection);
+    void setMaxDist(float newMaxDist);
+};
+
+class Shape;
+class Intersection
+{
+    Ray ray{};
+    float t{Ray::MAX_RAY_DIST};
+    Shape *pShape{nullptr};
+
+    Intersection();
+    Intersection(const Intersection &i);
+    Intersection(const Ray &ray);
+
+    bool intersected() const;
+    Point3 position() const;
 };
 
 #endif

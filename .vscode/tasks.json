@@ -1,0 +1,29 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build project",
+            "type": "shell",
+            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -g -pedantic -Werror -Wall -Weffc++ -Wextra -Wconversion -o ../bin/main",
+            "group": "build"
+        },
+        {
+            "label": "Build & Run project",
+            "type": "shell",
+            "dependsOn": ["Build project"],
+            "command": "./bin/main",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build & Run project without warnings",
+            "type": "shell",
+            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -o ../bin/main && ../bin/main",
+            "group": "build"
+        }
+    ]
+}

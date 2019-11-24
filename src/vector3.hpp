@@ -32,9 +32,9 @@ public:
     float getY() const;
     float getZ() const;
 
-    void setX(float x);
-    void setY(float y);
-    void setZ(float z);
+    void setX(float newX);
+    void setY(float newY);
+    void setZ(float newZ);
 };
 
 Vector3 operator+(const Vector3 &v1, const Vector3 &v2);
