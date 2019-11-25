@@ -15,8 +15,8 @@ Point3 Ray::getOrigin() const { return origin; }
 Vector3 Ray::getDirection() const { return direction; }
 float Ray::getMaxDist() const { return maxDist; }
 
-void Ray::setOrigin(Point3 newOrigin) { origin = newOrigin; }
-void Ray::setDirection(Vector3 newDirection) { direction = newDirection; }
+void Ray::setOrigin(const Point3 &newOrigin) { origin = newOrigin; }
+void Ray::setDirection(const Vector3 &newDirection) { direction = newDirection; }
 void Ray::setMaxDist(float newMaxDist) { maxDist = newMaxDist; }
 
 Intersection::Intersection() {}
@@ -32,4 +32,15 @@ bool Intersection::intersected() const
 Point3 Intersection::position() const
 {
     return ray.calculate(t);
+}
+
+Ray Intersection::getRay() const { return ray; }
+float Intersection::getT() const { return t; }
+Shape *Intersection::getPShape() const { return pShape; }
+
+void Intersection::setRay(const Ray &newRay) { ray = newRay; }
+void Intersection::setT(float newT) { t = newT; }
+void Intersection::setPShape(Shape *newPShape)
+{
+    pShape = newPShape;
 }
