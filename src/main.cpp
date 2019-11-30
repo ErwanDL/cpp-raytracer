@@ -1,13 +1,32 @@
-#include <iostream>
-#include "vector3.hpp"
+#include "camera.hpp"
+#include "image.hpp"
+#include "math_utils.hpp"
+#include "shape.hpp"
+#include "vectors.hpp"
 
-int main()
-{
-    Vector3 v1{0.0f, 1.0f, 2.0f};
+int main() {
+    constexpr int width{720};
+    constexpr int height{480};
 
-    v1.setX(1.0f);
+    Image img{width, height};
 
-    std::cout << v1.length() << '\n';
+    PerspectiveCamera camera{
+        Point3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 1.0f, -1.0f),
+        Vector3(0.0f, 1.0f, 0.0f), Math::PI / 6,
+        static_cast<float>(width) / static_cast<float>(height)};
+
+    ShapeSet scene{};
+
+    Plane floor(Point3(0.0f, -10.0f, 0.0f), Vector3(0.0f, 1.0f, -0.1f),
+                Color(0.5f, 1.0f, 0.5f));
+    scene.addShape(&floor);
+
+    Sphere sphere{Point3(0.0f, 2.5f, -5.0f), 1.0f, Color(0.5f, 0.5f, 1.0f)};
+    scene.addShape(&sphere);
+
+    img.rayTrace(camera, scene);
+
+    img.saveImage("scene.ppm");
 
     return 0;
 }

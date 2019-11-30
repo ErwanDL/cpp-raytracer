@@ -6,14 +6,14 @@
         {
             "label": "Build project",
             "type": "shell",
-            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -g -pedantic -Werror -Wall -Weffc++ -Wextra -Wconversion -o ../bin/main",
+            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -g -std=c++17 -pedantic -Werror -Wall -Wextra -Wconversion -o ../main", // -Weffc++
             "group": "build"
         },
         {
             "label": "Build & Run project",
             "type": "shell",
             "dependsOn": ["Build project"],
-            "command": "./bin/main",
+            "command": "./main",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -22,7 +22,7 @@
         {
             "label": "Build & Run project without warnings",
             "type": "shell",
-            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -o ../bin/main && ../bin/main",
+            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -o -std=c++17 ../main && ../main",
             "group": "build"
         }
     ]
