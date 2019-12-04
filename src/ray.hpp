@@ -47,6 +47,7 @@ class Ray {
     ~Ray() {}
 
     Point3 pointAtDistance(float t) const;
+    Point3 pointOfIntersection() const;
 
     const Point3 &getOrigin() const;
     const Vector3 &getDirection() const;

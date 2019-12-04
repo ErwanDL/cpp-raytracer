@@ -5,21 +5,9 @@
 #include <vector>
 #include "camera.hpp"
 
-class Color final {
-   public:
-    float r{0.0f};
-    float g{0.0f};
-    float b{0.0f};
-
-    Color();
-    Color(float l);
-    Color(float red, float green, float blue);
-
-    Color &clamp(float min = 0.0f, float max = 1.0f);
-    Color &applyGamma(float exposure, float gamma);
-};
-
+class Color;
 class Scene;
+class Light;
 class Image {
    protected:
     int width;
@@ -33,7 +21,7 @@ class Image {
 
     void setPixel(int row, int col, const Color &color);
 
-    void rayTrace(const Camera &camera, Scene &scene);
+    void rayTrace(const Camera &camera, Scene &scene, const Light &light);
 
     void saveImage(const std::string &filename) const;
 };

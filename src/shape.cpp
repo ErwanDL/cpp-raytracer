@@ -41,6 +41,8 @@ bool Plane::intersect(Ray &ray) const {
     Intersection &i = ray.getIntersection();
 
     if (t <= Intersection::MIN_RAY_DIST || t >= i.getDistance()) return false;
+    Vector3 intersectionNormal{dDotN > 0.0f ? -normal : normal};
+    i.setNormal(intersectionNormal);
     i.setDistance(t);
     i.setPShape(this);
 
@@ -53,7 +55,8 @@ Sphere::Sphere(const Point3 &centre, float radius, const Color &color)
     : Shape(color), centre(centre), radius(radius) {}
 
 bool Sphere::intersect(Ray &ray) const {
-    float a{ray.getDirection().lengthSquared()};
+    // float a{ray.getDirection().lengthSquared()}; always equal to 1
+    float a{1};
     float b{2 * ray.getDirection().dot(ray.getOrigin() - centre)};
     float c{(ray.getOrigin() - centre).lengthSquared() - Math::sqr(radius)};
 
@@ -64,8 +67,9 @@ bool Sphere::intersect(Ray &ray) const {
 
     float t1{-b - std::sqrt(discriminant) / (2 * a)};
     float t2{-b + std::sqrt(discriminant) / (2 * a)};
+    std::cout << t1 << '\t' << t2 << '\t' << a << '\n';
 
-    Intersection &i = ray.getIntersection();
+    Intersection &i{ray.getIntersection()};
 
     // we check t1 first because it is always closer than t2
     if (t1 > Intersection::MIN_RAY_DIST && t1 < i.getDistance())
@@ -74,7 +78,7 @@ bool Sphere::intersect(Ray &ray) const {
         i.setDistance(t2);
     else
         return false;
-
     i.setPShape(this);
+    i.setNormal((ray.pointOfIntersection() - centre).normalized());
     return true;
 }

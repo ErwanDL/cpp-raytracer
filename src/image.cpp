@@ -1,42 +1,9 @@
 #include "image.hpp"
-#include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <fstream>
+#include "light.hpp"
 #include "shape.hpp"
 #include "vectors.hpp"
-
-Color::Color() {}
-Color::Color(float f) {
-    assert(
-        f <= 1.0f &&
-        "Floats given to the Color constructor must be between 0.0f and 1.0f");
-    r = f;
-    g = f;
-    b = f;
-}
-Color::Color(float red, float green, float blue) {
-    assert(
-        red <= 1.0f && blue <= 1.0f && green <= 1.0f &&
-        "Floats given to the Color constructor must be between 0.0f and 1.0f");
-    r = red;
-    g = green;
-    b = blue;
-}
-
-Color &Color::clamp(float min, float max) {
-    r = std::clamp(r, min, max);
-    g = std::clamp(g, min, max);
-    b = std::clamp(b, min, max);
-    return *this;
-}
-
-Color &Color::applyGamma(float exposure, float gamma) {
-    r = std::pow(r * exposure, gamma);
-    g = std::pow(g * exposure, gamma);
-    b = std::pow(b * exposure, gamma);
-    return *this;
-}
 
 Image::Image(int width, int height, float exposure, float gamma)
     : width(width),
@@ -52,7 +19,7 @@ void Image::setPixel(int row, int col, const Color &color) {
     data.at(redIndex + 2) = static_cast<int>(std::round(color.b * 255));
 }
 
-void Image::rayTrace(const Camera &camera, Scene &scene) {
+void Image::rayTrace(const Camera &camera, Scene &scene, const Light &light) {
     for (int x{0}; x < width; ++x) {
         for (int y{0}; y < height; ++y) {
             const Vector2 screenCoord{
@@ -61,12 +28,9 @@ void Image::rayTrace(const Camera &camera, Scene &scene) {
                     1.0f};
             Ray ray{camera.makeRay(screenCoord)};
             if (scene.intersect(ray)) {
-                const Shape *intersectedShape{
-                    ray.getIntersection().getPShape()};
+                Color intersectionColor{light.illuminate(ray, scene, camera)};
                 setPixel(y, x,
-                         Color(intersectedShape->getColor())
-                             .applyGamma(exposure, gamma)
-                             .clamp());
+                         intersectionColor.applyGamma(exposure, gamma).clamp());
             }
         }
     }

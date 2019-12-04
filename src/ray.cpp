@@ -1,4 +1,5 @@
 #include "ray.hpp"
+#include <cassert>
 #include "image.hpp"
 
 // CLASS INTERSECTION
@@ -33,8 +34,12 @@ Intersection &Intersection::operator=(const Intersection &other) {
 Ray::Ray(const Point3 &origin, const Vector3 &direction)
     : origin(origin), direction(direction) {}
 
-Point3 Ray::pointAtDistance(float t) const {
-    return Point3(origin + t * direction);
+Point3 Ray::pointAtDistance(float t) const { return origin + t * direction; }
+Point3 Ray::pointOfIntersection() const {
+    assert(intersection.getPShape() != nullptr &&
+           "You cannot get the point of intersection of this ray since it has "
+           "not intersected any shape.");
+    return pointAtDistance(intersection.getDistance());
 }
 
 const Point3 &Ray::getOrigin() const { return origin; }

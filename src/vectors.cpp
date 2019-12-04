@@ -49,7 +49,9 @@ Vector3 operator-(const Vector3 &v1, const Vector3 &v2) {
 Vector3 operator*(const Vector3 &v, float f) {
     return Vector3(v.getX() * f, v.getY() * f, v.getZ() * f);
 }
-Vector3 operator*(float f, const Vector3 &v) { return v * f; }
+Vector3 operator*(float f, const Vector3 &v) {
+    return Vector3(v.getX() * f, v.getY() * f, v.getZ() * f);
+}
 Vector3 operator/(const Vector3 &v, float f) {
     return Vector3(v.getX() / f, v.getY() / f, v.getZ() / f);
 }

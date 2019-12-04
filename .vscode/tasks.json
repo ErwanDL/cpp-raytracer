@@ -22,7 +22,7 @@
         {
             "label": "Build & Run project without warnings",
             "type": "shell",
-            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -o -std=c++17 ../main && ../main",
+            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -std=c++17 -o ../main && cd .. && ./main",
             "group": "build"
         }
     ]

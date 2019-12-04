@@ -2,7 +2,7 @@
 #define SHAPE_HPP
 
 #include <vector>
-#include "image.hpp"
+#include "material.hpp"
 #include "ray.hpp"
 #include "vectors.hpp"
 
@@ -38,7 +38,7 @@ class Shape : public IIntersectable {
 };
 
 class Plane : public Shape {
-   protected:
+   private:
     Point3 position;
     Vector3 normal;
 
@@ -51,7 +51,7 @@ class Plane : public Shape {
 };
 
 class Sphere : public Shape {
-   protected:
+   private:
     Point3 centre;
     float radius;
 
