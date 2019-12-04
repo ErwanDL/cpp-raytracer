@@ -5,6 +5,8 @@
 
 float IVector::length() const { return std::sqrt(lengthSquared()); }
 
+// CLASS VECTOR3
+
 Vector3::Vector3() {}
 Vector3::Vector3(const Vector3 &v) : x(v.x), y(v.y), z(v.z) {}
 Vector3::Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
@@ -90,6 +92,8 @@ float Vector3::getZ() const { return z; }
 void Vector3::setX(float newX) { x = newX; }
 void Vector3::setY(float newY) { y = newY; }
 void Vector3::setZ(float newZ) { z = newZ; }
+
+// CLASS VECTOR2
 
 Vector2::Vector2() {}
 Vector2::Vector2(const Vector2 &other) : u(other.u), v(other.v) {}

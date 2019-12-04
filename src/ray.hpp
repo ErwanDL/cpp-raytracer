@@ -5,57 +5,57 @@
 #include "image.hpp"
 #include "vectors.hpp"
 
-class Ray {
+class Shape;
+class Intersection {
    public:
     constexpr static float MIN_RAY_DIST{0.001f};
     constexpr static float MAX_RAY_DIST{1.0e30f};
 
    private:
-    Point3 origin{};
-    Vector3 direction{};
-    float maxDist{MAX_RAY_DIST};
-
-   public:
-    Ray();
-    Ray(const Ray &r);
-    Ray(const Point3 &origin, const Vector3 &direction,
-        float maxDist = MAX_RAY_DIST);
-
-    Point3 calculate(float t) const;
-
-    Point3 getOrigin() const;
-    Vector3 getDirection() const;
-    float getMaxDist() const;
-
-    void setOrigin(const Point3 &newOrigin);
-    void setDirection(const Vector3 &newDirection);
-    void setMaxDist(float newMaxDist);
-};
-
-class Shape;
-class Intersection {
-    Ray ray{};
-    float t{Ray::MAX_RAY_DIST};
-    Shape *pShape{nullptr};
-    Color color;
+    float distance{MAX_RAY_DIST};
+    Vector3 normal{};
+    const Shape *pShape{nullptr};
 
    public:
     Intersection();
-    Intersection(const Intersection &i);
-    Intersection(const Ray &ray);
+    Intersection(const Intersection &other);
+    Intersection(float distance, const Vector3 &normal, const Shape *pShape);
+
+    ~Intersection() {}
 
     bool intersected() const;
-    Point3 position() const;
 
-    Ray getRay() const;
-    float getT() const;
-    Shape *getPShape() const;
-    Color getColor() const;
+    float getDistance() const;
+    const Vector3 &getNormal() const;
+    const Shape *getPShape() const;
 
-    void setRay(const Ray &newRay);
-    void setT(float newT);
-    void setPShape(Shape *newPShape);
-    void setColor(const Color &color);
+    void setDistance(float newDistance);
+    void setNormal(const Vector3 &newNormal);
+    void setPShape(const Shape *newPShape);
+
+    Intersection &operator=(const Intersection &other);
+};
+
+class Ray {
+   private:
+    Point3 origin{};
+    Vector3 direction{};
+    Intersection intersection{};
+
+   public:
+    Ray(const Point3 &origin, const Vector3 &direction);
+    ~Ray() {}
+
+    Point3 pointAtDistance(float t) const;
+
+    const Point3 &getOrigin() const;
+    const Vector3 &getDirection() const;
+    const Intersection &getIntersection() const;
+    Intersection &getIntersection();
+
+    void setOrigin(const Point3 &newOrigin);
+    void setDirection(const Vector3 &newDirection);
+    void setIntersection(const Intersection &newIntersection);
 };
 
 #endif

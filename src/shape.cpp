@@ -2,91 +2,57 @@
 #include <cmath>
 #include "math_utils.hpp"
 
-ShapeSet::ShapeSet() {}
+// CLASS SCENE
 
-void ShapeSet::addShape(Shape *shape) { shapes.push_back(shape); }
+Scene::Scene() {}
 
-bool ShapeSet::intersect(Intersection &i) {
+void Scene::addShape(Shape *pShape) { shapes.push_back(pShape); }
+
+bool Scene::intersect(Ray &ray) const {
     bool doesIntersect{false};
 
-    for (Shape *const shape : shapes) {
-        if (shape->intersect(i)) doesIntersect = true;
+    for (const Shape *pShape : shapes) {
+        if (pShape->intersect(ray)) doesIntersect = true;
     }
 
     return doesIntersect;
 }
 
-bool ShapeSet::doesIntersect(const Ray &ray) const {
-    for (Shape *const shape : shapes) {
-        if (shape->doesIntersect(ray)) return true;
-    }
+// CLASS SHAPE
 
-    return false;
-}
+Shape::Shape(const Color &color) : color(color) {}
+
+const Color &Shape::getColor() const { return color; }
+
+void Shape::setColor(const Color &newColor) { color = newColor; }
+
+// CLASS PLANE
 
 Plane::Plane(const Point3 &position, const Vector3 &normal, const Color &color)
-    : position(position), normal(normal), color(color) {}
+    : Shape(color), position(position), normal(normal) {}
 
-bool Plane::intersect(Intersection &i) {
-    const Ray iRay{i.getRay()};
-    float dDotN{normal.dot(iRay.getDirection())};
-
-    if (dDotN == 0.0f) return false;
-
-    const float t{normal.dot(position - iRay.getOrigin()) / dDotN};
-
-    if (t <= Ray::MIN_RAY_DIST || t >= i.getT()) return false;
-    i.setT(t);
-    i.setPShape(this);
-    i.setColor(color);
-
-    return true;
-}
-
-bool Plane::doesIntersect(const Ray &ray) const {
+bool Plane::intersect(Ray &ray) const {
     float dDotN{normal.dot(ray.getDirection())};
 
     if (dDotN == 0.0f) return false;
 
     const float t{normal.dot(position - ray.getOrigin()) / dDotN};
 
-    if (t <= Ray::MAX_RAY_DIST || t >= ray.getMaxDist()) return false;
+    Intersection &i = ray.getIntersection();
+
+    if (t <= Intersection::MIN_RAY_DIST || t >= i.getDistance()) return false;
+    i.setDistance(t);
+    i.setPShape(this);
 
     return true;
 }
+
+// CLASS SPHERE
 
 Sphere::Sphere(const Point3 &centre, float radius, const Color &color)
-    : centre(centre), radius(radius), color(color) {}
+    : Shape(color), centre(centre), radius(radius) {}
 
-bool Sphere::intersect(Intersection &i) {
-    const Ray iRay{i.getRay()};
-
-    float a{iRay.getDirection().lengthSquared()};
-    float b{2 * iRay.getDirection().dot(iRay.getOrigin() - centre)};
-    float c{(iRay.getOrigin() - centre).lengthSquared() - Math::sqr(radius)};
-
-    float discriminant{Math::sqr(b) - 4 * a * c};
-
-    if (discriminant <= 0.0f)  // if no solution to equation
-        return false;
-
-    float t1{-b - std::sqrt(discriminant) / (2 * a)};
-    float t2{-b + std::sqrt(discriminant) / (2 * a)};
-
-    // we check t1 first because it is always closer than t2
-    if (t1 > Ray::MIN_RAY_DIST && t1 < i.getT())
-        i.setT(t1);
-    else if (t2 > Ray::MIN_RAY_DIST && t2 < i.getT())
-        i.setT(t2);
-    else
-        return false;
-
-    i.setPShape(this);
-    i.setColor(color);
-    return true;
-}
-
-bool Sphere::doesIntersect(const Ray &ray) const {
+bool Sphere::intersect(Ray &ray) const {
     float a{ray.getDirection().lengthSquared()};
     float b{2 * ray.getDirection().dot(ray.getOrigin() - centre)};
     float c{(ray.getOrigin() - centre).lengthSquared() - Math::sqr(radius)};
@@ -99,11 +65,16 @@ bool Sphere::doesIntersect(const Ray &ray) const {
     float t1{-b - std::sqrt(discriminant) / (2 * a)};
     float t2{-b + std::sqrt(discriminant) / (2 * a)};
 
+    Intersection &i = ray.getIntersection();
+
     // we check t1 first because it is always closer than t2
-    if (t1 > Ray::MIN_RAY_DIST && t1 < ray.getMaxDist())
-        return true;
-    else if (t2 > Ray::MIN_RAY_DIST && t2 < ray.getMaxDist())
-        return true;
+    if (t1 > Intersection::MIN_RAY_DIST && t1 < i.getDistance())
+        i.setDistance(t1);
+    else if (t2 > Intersection::MIN_RAY_DIST && t2 < i.getDistance())
+        i.setDistance(t2);
     else
         return false;
+
+    i.setPShape(this);
+    return true;
 }

@@ -52,7 +52,7 @@ void Image::setPixel(int row, int col, const Color &color) {
     data.at(redIndex + 2) = static_cast<int>(std::round(color.b * 255));
 }
 
-void Image::rayTrace(const Camera &camera, Shape &scene) {
+void Image::rayTrace(const Camera &camera, Scene &scene) {
     for (int x{0}; x < width; ++x) {
         for (int y{0}; y < height; ++y) {
             const Vector2 screenCoord{
@@ -60,10 +60,11 @@ void Image::rayTrace(const Camera &camera, Shape &scene) {
                 -2.0f * static_cast<float>(y) / static_cast<float>(height) +
                     1.0f};
             Ray ray{camera.makeRay(screenCoord)};
-            Intersection intersection{ray};
-            if (scene.intersect(intersection)) {
+            if (scene.intersect(ray)) {
+                const Shape *intersectedShape{
+                    ray.getIntersection().getPShape()};
                 setPixel(y, x,
-                         intersection.getColor()
+                         Color(intersectedShape->getColor())
                              .applyGamma(exposure, gamma)
                              .clamp());
             }

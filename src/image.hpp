@@ -19,7 +19,7 @@ class Color final {
     Color &applyGamma(float exposure, float gamma);
 };
 
-class Shape;
+class Scene;
 class Image {
    protected:
     int width;
@@ -33,7 +33,7 @@ class Image {
 
     void setPixel(int row, int col, const Color &color);
 
-    void rayTrace(const Camera &camera, Shape &scene);
+    void rayTrace(const Camera &camera, Scene &scene);
 
     void saveImage(const std::string &filename) const;
 };

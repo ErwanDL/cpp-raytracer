@@ -6,7 +6,7 @@
         {
             "label": "Build project",
             "type": "shell",
-            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -g -std=c++17 -pedantic -Werror -Wall -Wextra -Wconversion -o ../main", // -Weffc++
+            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -g -std=c++17 -pedantic -Weffc++ -Werror -Wall -Wextra -Wconversion -o ../main",
             "group": "build"
         },
         {

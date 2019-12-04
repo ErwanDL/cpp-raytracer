@@ -6,54 +6,61 @@
 #include "ray.hpp"
 #include "vectors.hpp"
 
-class Shape {
+class IIntersectable {
    public:
-    virtual bool intersect(Intersection &i) = 0;
-    virtual bool doesIntersect(const Ray &ray) const = 0;
-    virtual ~Shape() {}
+    virtual bool intersect(Ray &ray) const = 0;
+    virtual ~IIntersectable() {}
 };
 
-class ShapeSet : public Shape {
+class Scene : public IIntersectable {
    protected:
     std::vector<Shape *> shapes{};
 
    public:
-    ShapeSet();
-    virtual ~ShapeSet() {}
+    Scene();
+    virtual ~Scene() {}
 
     void addShape(Shape *shape);
-    virtual bool intersect(Intersection &i);
-    virtual bool doesIntersect(const Ray &ray) const;
+    virtual bool intersect(Ray &ray) const override;
+};
+
+class Shape : public IIntersectable {
+   protected:
+    Color color;
+
+   public:
+    Shape(const Color &color);
+    virtual ~Shape() {}
+
+    const Color &getColor() const;
+
+    void setColor(const Color &newColor);
 };
 
 class Plane : public Shape {
    protected:
     Point3 position;
     Vector3 normal;
-    Color color;
 
    public:
     Plane(const Point3 &position, const Vector3 &normal,
           const Color &color = Color{1.0f});
     virtual ~Plane() {}
 
-    virtual bool intersect(Intersection &i);
-    virtual bool doesIntersect(const Ray &ray) const;
+    virtual bool intersect(Ray &ray) const override;
 };
 
 class Sphere : public Shape {
    protected:
     Point3 centre;
     float radius;
-    Color color;
 
    public:
     Sphere(const Point3 &centre, float radius,
            const Color &color = Color{1.0f});
     virtual ~Sphere() {}
 
-    virtual bool intersect(Intersection &i);
-    virtual bool doesIntersect(const Ray &ray) const;
+    virtual bool intersect(Ray &ray) const override;
 };
 
 #endif

@@ -13,6 +13,8 @@ PerspectiveCamera::PerspectiveCamera(const Point3 &origin,
     right = forward.cross(upguide).normalized();
     up = right.cross(forward);
     width = height * aspectRatio;
+    std::cout << "camera width: " << width << ", camera height: " << height
+              << '\n';
 }
 
 Ray PerspectiveCamera::makeRay(const Point2 &point) const {

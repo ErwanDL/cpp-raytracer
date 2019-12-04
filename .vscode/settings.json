@@ -7,7 +7,7 @@
         "**/requirements{/**,*}.{txt,in}": "pip-requirements",
         "array": "cpp",
         "atomic": "cpp",
-        "*.tcc": "cpp",
+        "*.distancecc": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",

@@ -18,8 +18,8 @@ class PerspectiveCamera : public Camera {
     Vector3 up{};
     Vector3 right{};
 
-    float height;
-    float width;
+    float height{1.0f};
+    float width{1.0f};
 
    public:
     PerspectiveCamera(const Point3 &origin, const Vector3 &target,

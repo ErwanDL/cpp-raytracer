@@ -1,3 +1,4 @@
+#include <iostream>
 #include "camera.hpp"
 #include "image.hpp"
 #include "math_utils.hpp"
@@ -12,16 +13,16 @@ int main() {
 
     PerspectiveCamera camera{
         Point3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 1.0f, -1.0f),
-        Vector3(0.0f, 1.0f, 0.0f), Math::PI / 6,
+        Vector3(0.0f, 1.0f, 0.0f), Math::PI / 4,
         static_cast<float>(width) / static_cast<float>(height)};
 
-    ShapeSet scene{};
+    Scene scene{};
 
-    Plane floor(Point3(0.0f, -10.0f, 0.0f), Vector3(0.0f, 1.0f, -0.1f),
+    Plane floor(Point3(0.0f, -10.0f, 0.0f), Vector3(0.0f, 1.0f, -0.2f),
                 Color(0.5f, 1.0f, 0.5f));
     scene.addShape(&floor);
 
-    Sphere sphere{Point3(0.0f, 2.5f, -5.0f), 1.0f, Color(0.5f, 0.5f, 1.0f)};
+    Sphere sphere{Point3(3.0f, 3.0f, -5.0f), 0.5f, Color(0.5f, 0.5f, 1.0f)};
     scene.addShape(&sphere);
 
     img.rayTrace(camera, scene);
