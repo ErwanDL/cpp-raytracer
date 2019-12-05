@@ -20,9 +20,9 @@
             }
         },
         {
-            "label": "Build & Run project without warnings",
+            "label": "Build & Run project without Werror",
             "type": "shell",
-            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -std=c++17 -o ../main && cd .. && ./main",
+            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -g -std=c++17 -pedantic -Weffc++ -Wall -Wextra -Wconversion -o ../main && cd .. && ./main",
             "group": "build"
         }
     ]

@@ -12,12 +12,12 @@ class Intersection {
     constexpr static float MAX_RAY_DIST{1.0e30f};
 
    private:
-    float distance{MAX_RAY_DIST};
+    float distance;
     Vector3 normal{};
     const Shape *pShape{nullptr};
 
    public:
-    Intersection();
+    Intersection(float distance = MAX_RAY_DIST);
     Intersection(const Intersection &other);
     Intersection(float distance, const Vector3 &normal, const Shape *pShape);
 
@@ -43,7 +43,8 @@ class Ray {
     Intersection intersection{};
 
    public:
-    Ray(const Point3 &origin, const Vector3 &direction);
+    Ray(const Point3 &origin, const Vector3 &direction,
+        float maxdist = Intersection::MAX_RAY_DIST);
     ~Ray() {}
 
     Point3 pointAtDistance(float t) const;

@@ -4,7 +4,7 @@
 
 // CLASS INTERSECTION
 
-Intersection::Intersection() {}
+Intersection::Intersection(float distance) : distance(distance) {}
 
 Intersection::Intersection(const Intersection &other)
     : distance(other.distance), normal(other.normal), pShape(other.pShape) {}
@@ -31,8 +31,8 @@ Intersection &Intersection::operator=(const Intersection &other) {
 
 // CLASS RAY
 
-Ray::Ray(const Point3 &origin, const Vector3 &direction)
-    : origin(origin), direction(direction) {}
+Ray::Ray(const Point3 &origin, const Vector3 &direction, float maxDist)
+    : origin(origin), direction(direction), intersection(maxDist) {}
 
 Point3 Ray::pointAtDistance(float t) const { return origin + t * direction; }
 Point3 Ray::pointOfIntersection() const {
