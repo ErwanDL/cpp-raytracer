@@ -19,5 +19,5 @@ Color Light::illuminate(const Ray& intersectedRay, const Scene& scene,
     const float lightDotN{lightDirection.dot(i.getNormal())};
 
     if (lightDotN >= 0.0f) return Color(0.0f);
-    return color * (i.getPShape()->getColor());
+    return -lightDotN * color * (i.getPShape()->getColor());
 }

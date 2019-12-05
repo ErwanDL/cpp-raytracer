@@ -8,8 +8,8 @@
 #include "vectors.hpp"
 
 int main() {
-    constexpr int width{450};
-    constexpr int height{300};
+    constexpr int width{720};
+    constexpr int height{480};
 
     Image img{width, height};
 
@@ -20,14 +20,14 @@ int main() {
 
     Scene scene{};
 
-    /* Plane floor(Point3(0.0f, -10.0f, 0.0f), Vector3(0.0f, 1.0f, -0.2f),
+    Plane floor(Point3(0.0f, -10.0f, 0.0f), Vector3(0.0f, 1.0f, -0.2f),
                 Color(0.5f, 1.0f, 0.5f));
-    scene.addShape(&floor); */
+    scene.addShape(&floor);
 
-    Sphere sphere{Point3(3.0f, 3.0f, -5.0f), 0.5f, Color(0.5f, 0.5f, 1.0f)};
+    Sphere sphere{Point3(0.0f, 3.0f, -5.0f), 1.0f, Color(0.5f, 0.5f, 1.0f)};
     scene.addShape(&sphere);
 
-    Light light{Point3(3.0f, 3.0f, 0.0f), Color(0.7f)};
+    Light light{Point3(3.0f, 3.0f, 0.0f), Color(1.0f)};
 
     img.rayTrace(camera, scene, light);
 

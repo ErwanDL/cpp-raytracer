@@ -56,7 +56,7 @@ Sphere::Sphere(const Point3 &centre, float radius, const Color &color)
 
 bool Sphere::intersect(Ray &ray) const {
     // float a{ray.getDirection().lengthSquared()}; always equal to 1
-    float a{1};
+    float a{1.0f};
     float b{2 * ray.getDirection().dot(ray.getOrigin() - centre)};
     float c{(ray.getOrigin() - centre).lengthSquared() - Math::sqr(radius)};
 
@@ -65,9 +65,8 @@ bool Sphere::intersect(Ray &ray) const {
     if (discriminant <= 0.0f)  // if no solution to equation
         return false;
 
-    float t1{-b - std::sqrt(discriminant) / (2 * a)};
-    float t2{-b + std::sqrt(discriminant) / (2 * a)};
-    std::cout << t1 << '\t' << t2 << '\t' << a << '\n';
+    float t1{(-b - std::sqrt(discriminant)) / (2 * a)};
+    float t2{(-b + std::sqrt(discriminant)) / (2 * a)};
 
     Intersection &i{ray.getIntersection()};
 
