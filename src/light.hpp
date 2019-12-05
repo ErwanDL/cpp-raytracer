@@ -31,14 +31,14 @@ class LightRack : public ILight {
                              const Camera& cam) const override;
 };
 
-class Spotlight : public ILight {
+class PointLight : public ILight {
     Point3 origin{0.0f, 5.0f, -1.0f};
     Color color{0.5f};
 
    public:
-    Spotlight();
-    Spotlight(const Point3& origin, const Color& color);
-    virtual ~Spotlight() {}
+    PointLight();
+    PointLight(const Point3& origin, const Color& color);
+    virtual ~PointLight() {}
 
     virtual Color illuminate(const Ray& intersectedRay, const Scene& scene,
                              const Camera& cam) const override;

@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <stdexcept>
 
 // STRUCT COLOR
 
@@ -16,9 +17,9 @@ Color::Color(float f) {
     b = f;
 }
 Color::Color(float red, float green, float blue) {
-    assert(
-        red <= 1.0f && blue <= 1.0f && green <= 1.0f &&
-        "Floats given to the Color constructor must be between 0.0f and 1.0f");
+    assert(red <= 1.0f && blue <= 1.0f && green <= 1.0f &&
+           "Floats given to the Color constructor must be "
+           "between 0.0f and 1.0f");
     r = red;
     g = green;
     b = blue;
@@ -67,12 +68,10 @@ Color &Color::operator+=(const Color &other) {
 
 Material::Material() {}
 
-Material::Material(const Color &color) : color(color) {}
-
-Material::Material(const Color &color, float ambiant, float diffuse,
-                   float specular, float shininess)
+Material::Material(const Color &color, float specular, float shininess,
+                   float diffuse, float ambient)
     : color(color),
-      ambiant(ambiant),
+      ambient(ambient),
       diffuse(diffuse),
       specular(specular),
       shininess(shininess) {}

@@ -26,15 +26,14 @@ std::ostream &operator<<(std::ostream &out, const Color &color);
 
 struct Material final {
     Color color{0.8f, 0.2f, 0.2f};
-    float ambiant{0.3f};
-    float diffuse{0.7f};
+    float ambient{1.0f};
+    float diffuse{1.0f};
     float specular{0.2f};
     float shininess{10.0f};
 
     Material();
-    Material(const Color &color);
-    Material(const Color &color, float ambiant, float diffuse, float specular,
-             float shininess);
+    Material(const Color &color, float specular = 0.2f, float shininess = 10.0f,
+             float diffuse = 1.0f, float ambient = 1.0f);
 };
 
 #endif

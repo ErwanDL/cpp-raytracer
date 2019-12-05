@@ -13,23 +13,25 @@ void LightRack::addLight(ILight* pLight) { lights.push_back(pLight); }
 
 Color LightRack::illuminate(const Ray& intersectedRay, const Scene& scene,
                             const Camera& cam) const {
-    Color resultingColor{
-        ambient * intersectedRay.getIntersection().getPShape()->getColor()};
+    const Material& material{
+        intersectedRay.getIntersection().getPShape()->getMaterial()};
+    Color resultingColor{0.0f};
+    resultingColor += this->ambient * material.ambient * material.color;
     for (const ILight* pLight : lights) {
         resultingColor += pLight->illuminate(intersectedRay, scene, cam);
     }
     return resultingColor;
 }
 
-// CLASS SPOTLIGHT
+// CLASS POINTLIGHT
 
-Spotlight::Spotlight() {}
+PointLight::PointLight() {}
 
-Spotlight::Spotlight(const Point3& origin, const Color& color)
+PointLight::PointLight(const Point3& origin, const Color& color)
     : origin(origin), color(color) {}
 
-Color Spotlight::illuminate(const Ray& intersectedRay, const Scene& scene,
-                            const Camera& cam) const {
+Color PointLight::illuminate(const Ray& intersectedRay, const Scene& scene,
+                             const Camera& cam) const {
     const Point3 interPoint{intersectedRay.pointOfIntersection()};
     const Intersection& i{intersectedRay.getIntersection()};
 
@@ -46,5 +48,7 @@ Color Spotlight::illuminate(const Ray& intersectedRay, const Scene& scene,
         return Color(0.0f);
     }
 
-    return lightDotN * color * (i.getPShape()->getColor());
+    const Material& material{i.getPShape()->getMaterial()};
+
+    return lightDotN * this->color * material.color * material.diffuse;
 }

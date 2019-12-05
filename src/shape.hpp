@@ -26,15 +26,15 @@ class Scene : public IIntersectable {
 
 class Shape : public IIntersectable {
    protected:
-    Color color;
+    Material material;
 
    public:
-    Shape(const Color &color);
+    Shape(const Material &material);
     virtual ~Shape() {}
 
-    const Color &getColor() const;
+    const Material &getMaterial() const;
 
-    void setColor(const Color &newColor);
+    void setMaterial(const Material &newMaterial);
 };
 
 class Plane : public Shape {
@@ -44,7 +44,7 @@ class Plane : public Shape {
 
    public:
     Plane(const Point3 &position, const Vector3 &normal,
-          const Color &color = Color{1.0f});
+          const Material &material = Material());
     virtual ~Plane() {}
 
     virtual bool intersect(Ray &ray) const override;
@@ -57,7 +57,7 @@ class Sphere : public Shape {
 
    public:
     Sphere(const Point3 &centre, float radius,
-           const Color &color = Color{1.0f});
+           const Material &material = Material());
     virtual ~Sphere() {}
 
     virtual bool intersect(Ray &ray) const override;

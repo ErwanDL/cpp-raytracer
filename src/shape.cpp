@@ -20,16 +20,17 @@ bool Scene::intersect(Ray &ray) const {
 
 // CLASS SHAPE
 
-Shape::Shape(const Color &color) : color(color) {}
+Shape::Shape(const Material &material) : material(material) {}
 
-const Color &Shape::getColor() const { return color; }
+const Material &Shape::getMaterial() const { return material; }
 
-void Shape::setColor(const Color &newColor) { color = newColor; }
+void Shape::setMaterial(const Material &newMaterial) { material = newMaterial; }
 
 // CLASS PLANE
 
-Plane::Plane(const Point3 &position, const Vector3 &normal, const Color &color)
-    : Shape(color), position(position), normal(normal) {}
+Plane::Plane(const Point3 &position, const Vector3 &normal,
+             const Material &material)
+    : Shape(material), position(position), normal(normal) {}
 
 bool Plane::intersect(Ray &ray) const {
     float dDotN{normal.dot(ray.getDirection())};
@@ -51,8 +52,8 @@ bool Plane::intersect(Ray &ray) const {
 
 // CLASS SPHERE
 
-Sphere::Sphere(const Point3 &centre, float radius, const Color &color)
-    : Shape(color), centre(centre), radius(radius) {}
+Sphere::Sphere(const Point3 &centre, float radius, const Material &material)
+    : Shape(material), centre(centre), radius(radius) {}
 
 bool Sphere::intersect(Ray &ray) const {
     // float a{ray.getDirection().lengthSquared()}; always equal to 1
