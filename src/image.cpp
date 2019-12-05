@@ -19,7 +19,8 @@ void Image::setPixel(int row, int col, const Color &color) {
     data.at(redIndex + 2) = static_cast<int>(std::round(color.b * 255));
 }
 
-void Image::rayTrace(const Camera &camera, Scene &scene, const Light &light) {
+void Image::rayTrace(const Camera &camera, Scene &scene,
+                     const LightRack &lightRack) {
     for (int x{0}; x < width; ++x) {
         for (int y{0}; y < height; ++y) {
             const Vector2 screenCoord{
@@ -28,7 +29,8 @@ void Image::rayTrace(const Camera &camera, Scene &scene, const Light &light) {
                     1.0f};
             Ray ray{camera.makeRay(screenCoord)};
             if (scene.intersect(ray)) {
-                Color intersectionColor{light.illuminate(ray, scene, camera)};
+                Color intersectionColor{
+                    lightRack.illuminate(ray, scene, camera)};
                 setPixel(y, x,
                          intersectionColor.applyGamma(exposure, gamma).clamp());
             }

@@ -5,13 +5,31 @@
 #include "shape.hpp"
 #include "vectors.hpp"
 
-Light::Light() {}
+// CLASS LIGHTRACK
 
-Light::Light(const Point3& origin, const Color& color)
+LightRack::LightRack(const Color& ambient) : ambient(ambient){};
+
+void LightRack::addLight(ILight* pLight) { lights.push_back(pLight); }
+
+Color LightRack::illuminate(const Ray& intersectedRay, const Scene& scene,
+                            const Camera& cam) const {
+    Color resultingColor{
+        ambient * intersectedRay.getIntersection().getPShape()->getColor()};
+    for (const ILight* pLight : lights) {
+        resultingColor += pLight->illuminate(intersectedRay, scene, cam);
+    }
+    return resultingColor;
+}
+
+// CLASS SPOTLIGHT
+
+Spotlight::Spotlight() {}
+
+Spotlight::Spotlight(const Point3& origin, const Color& color)
     : origin(origin), color(color) {}
 
-Color Light::illuminate(const Ray& intersectedRay, const Scene& scene,
-                        const Camera& cam) const {
+Color Spotlight::illuminate(const Ray& intersectedRay, const Scene& scene,
+                            const Camera& cam) const {
     const Intersection& i{intersectedRay.getIntersection()};
 
     const Vector3 lightDirection{

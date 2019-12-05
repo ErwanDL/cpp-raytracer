@@ -14,6 +14,8 @@ struct Color final {
 
     Color &clamp(float min = 0.0f, float max = 1.0f);
     Color &applyGamma(float exposure, float gamma);
+
+    Color &operator+=(const Color &other);
 };
 
 Color operator*(const Color &c1, const Color &c2);

@@ -7,7 +7,7 @@
 
 class Color;
 class Scene;
-class Light;
+class LightRack;
 class Image {
    protected:
     int width;
@@ -21,7 +21,8 @@ class Image {
 
     void setPixel(int row, int col, const Color &color);
 
-    void rayTrace(const Camera &camera, Scene &scene, const Light &light);
+    void rayTrace(const Camera &camera, Scene &scene,
+                  const LightRack &lightRack);
 
     void saveImage(const std::string &filename) const;
 };

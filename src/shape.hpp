@@ -13,7 +13,7 @@ class IIntersectable {
 };
 
 class Scene : public IIntersectable {
-   protected:
+   private:
     std::vector<Shape *> shapes{};
 
    public:

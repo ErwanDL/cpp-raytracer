@@ -56,6 +56,13 @@ std::ostream &operator<<(std::ostream &out, const Color &color) {
     return out;
 }
 
+Color &Color::operator+=(const Color &other) {
+    r += other.r;
+    g += other.g;
+    b += other.b;
+    return *this;
+}
+
 // STRUCT MATERIAL
 
 Material::Material() {}
