@@ -2,9 +2,9 @@
     "files.associations": {
         "*.ejs": "html",
         "*.rmd": "markdown",
-        "**/templates/*.html": "django-html",
         "**/templates/*": "django-txt",
         "**/requirements{/**,*}.{txt,in}": "pip-requirements",
+        "**/templates/*.html": "django-html",
         "array": "cpp",
         "atomic": "cpp",
         "*.distancecc": "cpp",
@@ -50,6 +50,7 @@
         "typeinfo": "cpp",
         "bitset": "cpp",
         "ctime": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "*.tcc": "cpp"
     }
 }

@@ -87,6 +87,10 @@ Vector3 Vector3::cross(const Vector3 &other) const {
                    x * other.y - y * other.x);
 }
 
+Vector3 Vector3::reflected(const Vector3 &normal) const {
+    return 2 * this->dot(normal) * normal - *this;
+}
+
 float Vector3::getX() const { return x; }
 float Vector3::getY() const { return y; }
 float Vector3::getZ() const { return z; }

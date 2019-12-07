@@ -6,12 +6,6 @@
 class Ray;
 
 class Camera {
-   public:
-    virtual Ray makeRay(const Point2 &point) const = 0;
-    virtual ~Camera() {}
-};
-
-class PerspectiveCamera : public Camera {
    private:
     Point3 origin{};
     Vector3 forward{};
@@ -22,10 +16,12 @@ class PerspectiveCamera : public Camera {
     float width{1.0f};
 
    public:
-    PerspectiveCamera(const Point3 &origin, const Vector3 &target,
-                      const Vector3 &upguide, float fov, float aspectRatio);
-    virtual ~PerspectiveCamera() override {}
-    virtual Ray makeRay(const Point2 &point) const override;
+    Camera(const Point3 &origin, const Vector3 &target, const Vector3 &upguide,
+           float fov, float aspectRatio);
+    virtual ~Camera() {}
+    virtual Ray makeRay(const Point2 &point) const;
+
+    const Point3 &getOrigin() const;
 };
 
 #endif

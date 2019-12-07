@@ -49,6 +49,12 @@ Color PointLight::illuminate(const Ray& intersectedRay, const Scene& scene,
     }
 
     const Material& material{i.getPShape()->getMaterial()};
-
-    return lightDotN * this->color * material.color * material.diffuse;
+    const Color diffuseColor{lightDotN * this->color * material.color *
+                             material.diffuse};
+    const Vector3 towardsCam{(cam.getOrigin() - interPoint).normalized()};
+    const Color specularColor{
+        std::pow(towardsCam.dot(towardsLight.reflected(i.getNormal())),
+                 material.shininess) *
+        material.specular * this->color};
+    return diffuseColor + specularColor;
 }

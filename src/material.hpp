@@ -25,14 +25,14 @@ Color operator+(const Color &c1, const Color &c2);
 std::ostream &operator<<(std::ostream &out, const Color &color);
 
 struct Material final {
-    Color color{0.8f, 0.2f, 0.2f};
-    float ambient{1.0f};
-    float diffuse{1.0f};
-    float specular{0.2f};
-    float shininess{10.0f};
+    Color color;
+    float ambient;
+    float diffuse;
+    float specular;
+    float shininess;
 
-    Material();
-    Material(const Color &color, float specular = 0.2f, float shininess = 10.0f,
+    Material(const Color &color = Color(0.8f, 0.2f, 0.2f),
+             float specular = 1.0f, float shininess = 60.0f,
              float diffuse = 1.0f, float ambient = 1.0f);
 };
 

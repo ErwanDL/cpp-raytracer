@@ -23,7 +23,7 @@ class LightRack : public ILight {
     Color ambient;
 
    public:
-    LightRack(const Color& ambient = 0.4f);
+    LightRack(const Color& ambient = 0.5f);
     virtual ~LightRack() {}
 
     void addLight(ILight* pLight);

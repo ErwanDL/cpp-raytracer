@@ -29,6 +29,7 @@ class Vector3 : public IVector {
     Vector3 normalized() const;
     float dot(const Vector3 &other) const;
     Vector3 cross(const Vector3 &other) const;
+    Vector3 reflected(const Vector3 &normal) const;
 
     Vector3 &operator+=(const Vector3 &other);
     Vector3 &operator-=(const Vector3 &other);

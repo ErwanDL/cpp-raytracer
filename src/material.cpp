@@ -17,6 +17,9 @@ Color::Color(float f) {
     b = f;
 }
 Color::Color(float red, float green, float blue) {
+    if (red > 1.0f || blue > 1.0f || green > 1.0f) {
+        std::cout << red << '\t' << green << '\t' << blue << '\n';
+    }
     assert(red <= 1.0f && blue <= 1.0f && green <= 1.0f &&
            "Floats given to the Color constructor must be "
            "between 0.0f and 1.0f");
@@ -49,7 +52,8 @@ Color operator*(const Color &c, float f) {
     return Color(c.r * f, c.g * f, c.b * f);
 }
 Color operator+(const Color &c1, const Color &c2) {
-    return Color(c1.r + c2.r, c1.g + c2.g, c1.b + c2.b);
+    return Color(std::min(c1.r + c2.r, 1.0f), std::min(c1.g + c2.g, 1.0f),
+                 std::min(c1.b + c2.b, 1.0f));
 }
 std::ostream &operator<<(std::ostream &out, const Color &color) {
     out << "Color(R: " << color.r << ", G: " << color.g << ", B: " << color.b
@@ -61,12 +65,10 @@ Color &Color::operator+=(const Color &other) {
     r += other.r;
     g += other.g;
     b += other.b;
-    return *this;
+    return this->clamp();
 }
 
 // STRUCT MATERIAL
-
-Material::Material() {}
 
 Material::Material(const Color &color, float specular, float shininess,
                    float diffuse, float ambient)
