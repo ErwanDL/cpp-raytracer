@@ -6,24 +6,27 @@
         {
             "label": "Build project",
             "type": "shell",
-            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -g -std=c++17 -pedantic -Weffc++ -Werror -Wall -Wextra -Wconversion -o ../main",
+            "command": "cd build && make raytracer",
             "group": "build"
         },
         {
             "label": "Build & Run project",
             "type": "shell",
             "dependsOn": ["Build project"],
-            "command": "./main",
+            "command": "./build/raytracer",
             "group": {
                 "kind": "build",
                 "isDefault": true
             }
         },
         {
-            "label": "Build & Run project without Werror",
+            "label": "Build & Run tests",
             "type": "shell",
-            "command": "cd src && SRCFILES=*.cpp && g++ $SRCFILES -g -std=c++17 -pedantic -Weffc++ -Wall -Wextra -Wconversion -o ../main && cd .. && ./main",
-            "group": "build"
+            "command": "cd build && make runtests && ./runtests",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
         }
     ]
 }

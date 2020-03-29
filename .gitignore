@@ -1,4 +1,7 @@
-main
 *.png
 *.ppm
 *.exe
+c_cpp_properties.json
+settings.json
+build/*
+.DS_Store
