@@ -2,6 +2,7 @@
 #define RAY_HPP
 
 #include <vector>
+
 #include "image.hpp"
 #include "vectors.hpp"
 
@@ -13,15 +14,12 @@ class Intersection {
 
    private:
     float distance;
-    Vector3 normal{};
+    Vector3 normal{0.0f};
     const Shape *pShape{nullptr};
 
    public:
-    Intersection(float distance = MAX_RAY_DIST);
-    Intersection(const Intersection &other);
+    explicit Intersection(float distance = MAX_RAY_DIST);
     Intersection(float distance, const Vector3 &normal, const Shape *pShape);
-
-    ~Intersection() {}
 
     bool intersected() const;
 
@@ -32,20 +30,17 @@ class Intersection {
     void setDistance(float newDistance);
     void setNormal(const Vector3 &newNormal);
     void setPShape(const Shape *newPShape);
-
-    Intersection &operator=(const Intersection &other);
 };
 
 class Ray {
    private:
-    Point3 origin{};
-    Vector3 direction{};
-    Intersection intersection{};
+    Point3 origin;
+    Vector3 direction;
+    Intersection intersection;
 
    public:
     Ray(const Point3 &origin, const Vector3 &direction,
         float maxdist = Intersection::MAX_RAY_DIST);
-    ~Ray() {}
 
     Point3 pointAtDistance(float t) const;
     Point3 pointOfIntersection() const;

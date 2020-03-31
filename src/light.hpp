@@ -2,6 +2,7 @@
 #define LIGHT_HPP
 
 #include <vector>
+
 #include "material.hpp"
 #include "vectors.hpp"
 
@@ -11,24 +12,22 @@ class Camera;
 
 class ILight {
    public:
-    virtual ~ILight() {}
+    virtual ~ILight() = default;
 
     virtual Color illuminate(const Ray& intersectedRay, const Scene& scene,
                              const Camera& cam) const = 0;
 };
 
 class LightRack : public ILight {
-   protected:
     std::vector<ILight*> lights{};
     Color ambient;
 
    public:
-    LightRack(const Color& ambient = 0.5f);
-    virtual ~LightRack() {}
+    explicit LightRack(const Color& ambient = 0.5f);
 
     void addLight(ILight* pLight);
-    virtual Color illuminate(const Ray& intersectedRay, const Scene& scene,
-                             const Camera& cam) const override;
+    Color illuminate(const Ray& intersectedRay, const Scene& scene,
+                     const Camera& cam) const override;
 };
 
 class PointLight : public ILight {
@@ -36,12 +35,10 @@ class PointLight : public ILight {
     Color color{0.5f};
 
    public:
-    PointLight();
     PointLight(const Point3& origin, const Color& color);
-    virtual ~PointLight() {}
 
-    virtual Color illuminate(const Ray& intersectedRay, const Scene& scene,
-                             const Camera& cam) const override;
+    Color illuminate(const Ray& intersectedRay, const Scene& scene,
+                     const Camera& cam) const override;
 };
 
 #endif

@@ -1,5 +1,7 @@
 #include "light.hpp"
+
 #include <cmath>
+
 #include "camera.hpp"
 #include "ray.hpp"
 #include "shape.hpp"
@@ -24,8 +26,6 @@ Color LightRack::illuminate(const Ray& intersectedRay, const Scene& scene,
 }
 
 // CLASS POINTLIGHT
-
-PointLight::PointLight() {}
 
 PointLight::PointLight(const Point3& origin, const Color& color)
     : origin(origin), color(color) {}

@@ -2,6 +2,7 @@
 #define SHAPE_HPP
 
 #include <vector>
+
 #include "material.hpp"
 #include "ray.hpp"
 #include "vectors.hpp"
@@ -45,9 +46,8 @@ class Plane : public Shape {
    public:
     Plane(const Point3 &position, const Vector3 &normal,
           const Material &material = Material());
-    virtual ~Plane() {}
 
-    virtual bool intersect(Ray &ray) const override;
+    bool intersect(Ray &ray) const override;
 };
 
 class Sphere : public Shape {
@@ -58,9 +58,8 @@ class Sphere : public Shape {
    public:
     Sphere(const Point3 &centre, float radius,
            const Material &material = Material());
-    virtual ~Sphere() {}
 
-    virtual bool intersect(Ray &ray) const override;
+    bool intersect(Ray &ray) const override;
 };
 
 #endif

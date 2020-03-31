@@ -1,13 +1,13 @@
 #include "ray.hpp"
+
 #include <cassert>
+
 #include "image.hpp"
 
 // CLASS INTERSECTION
 
 Intersection::Intersection(float distance) : distance(distance) {}
 
-Intersection::Intersection(const Intersection &other)
-    : distance(other.distance), normal(other.normal), pShape(other.pShape) {}
 Intersection::Intersection(float distance, const Vector3 &normal,
                            const Shape *pShape)
     : distance(distance), normal(normal), pShape(pShape) {}
@@ -21,13 +21,6 @@ const Shape *Intersection::getPShape() const { return pShape; }
 void Intersection::setDistance(float newDistance) { distance = newDistance; }
 void Intersection::setNormal(const Vector3 &newNormal) { normal = newNormal; }
 void Intersection::setPShape(const Shape *newPShape) { pShape = newPShape; }
-
-Intersection &Intersection::operator=(const Intersection &other) {
-    distance = other.distance;
-    normal = other.normal;
-    pShape = other.pShape;
-    return *this;
-}
 
 // CLASS RAY
 

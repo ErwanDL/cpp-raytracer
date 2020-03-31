@@ -1,0 +1,6 @@
+-   supprimer interface Vector
+-   ajouter getDirection aux Vector
+-   pertinence des getters/setters des vectors ?
+-   objet intersection doit être indépendant de Ray : permet de ne pas passer et muter des rays en permanence
+-   rayTrace ne doit pas muter la Scene en argument (lié au précédent)
+-   Image -> Renderer

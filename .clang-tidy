@@ -11,4 +11,10 @@ Checks: 'bugprone-*,
         -readability-magic-numbers,
         -readability-uppercase-literal-suffix,
         -modernize-use-trailing-return-type,
-        -cppcoreguidelines-pro-type-vararg'
+        -cppcoreguidelines-pro-type-vararg,
+        -modernize-use-nodiscard,
+        -google-runtime-references'
+
+CheckOptions:
+    - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+      value: '1'

@@ -1,6 +1,8 @@
 #include "shape.hpp"
+
 #include <cmath>
-#include "math_utils.hpp"
+
+#include "utils.hpp"
 
 // CLASS SCENE
 
