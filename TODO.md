@@ -1,6 +1,10 @@
--   supprimer interface Vector
--   ajouter getDirection aux Vector
--   pertinence des getters/setters des vectors ?
+-   rename Image -> Renderer
 -   objet intersection doit être indépendant de Ray : permet de ne pas passer et muter des rays en permanence
 -   rayTrace ne doit pas muter la Scene en argument (lié au précédent)
--   Image -> Renderer
+-   Reflexions parfaites
+-   Skybox unicolore
+-   Reflexions glossy
+-   Texturing
+-   Anti aliasing
+-   Soft shadows
+-   Skybox HDRI

@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "image.hpp"
+#include "renderer.hpp"
 
 // CLASS INTERSECTION
 

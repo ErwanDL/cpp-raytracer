@@ -1,4 +1,4 @@
-#include "image.hpp"
+#include "renderer.hpp"
 
 #include <cmath>
 #include <fstream>
@@ -8,19 +8,19 @@
 #include "shape.hpp"
 #include "vectors.hpp"
 
-Image::Image(int width, int height, float exposure, float gamma)
+Renderer::Renderer(int width, int height, float exposure, float gamma)
     : width(width), height(height), exposure(exposure), gamma(gamma) {}
 
-void Image::setPixel(std::vector<int> &pixelValues, int row, int col,
-                     const Color &color) {
+void Renderer::setPixel(std::vector<int> &pixelValues, int row, int col,
+                        const Color &color) {
     int redIndex{width * row * 3 + col * 3};
     pixelValues.at(redIndex) = static_cast<int>(std::round(color.r * 255));
     pixelValues.at(redIndex + 1) = static_cast<int>(std::round(color.g * 255));
     pixelValues.at(redIndex + 2) = static_cast<int>(std::round(color.b * 255));
 }
 
-std::vector<int> Image::rayTrace(const Camera &camera, Scene &scene,
-                                 const LightRack &lightRack) {
+std::vector<int> Renderer::rayTrace(const Camera &camera, Scene &scene,
+                                    const LightRack &lightRack) {
     std::vector<int> pixelValues(width * height * 3, 0);
 
     for (int x{0}; x < width; ++x) {
@@ -42,16 +42,16 @@ std::vector<int> Image::rayTrace(const Camera &camera, Scene &scene,
     return pixelValues;
 }
 
-void Image::saveImage(const std::vector<int> &pixelValues,
-                      const std::string &filename) const {
-    std::ofstream img{filename};
-    img << "P3" << '\n';
-    img << width << ' ' << height << '\n';
-    img << 255 << '\n';
+void Renderer::saveRenderer(const std::vector<int> &pixelValues,
+                            const std::string &filename) const {
+    std::ofstream renderer{filename};
+    renderer << "P3" << '\n';
+    renderer << width << ' ' << height << '\n';
+    renderer << 255 << '\n';
 
     for (int i : pixelValues) {
-        img << i << ' ';
+        renderer << i << ' ';
     }
 
-    img.close();
+    renderer.close();
 }

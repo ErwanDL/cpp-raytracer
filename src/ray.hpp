@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "image.hpp"
+#include "renderer.hpp"
 #include "vectors.hpp"
 
 class Shape;

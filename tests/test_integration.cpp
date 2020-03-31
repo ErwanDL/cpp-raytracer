@@ -1,9 +1,9 @@
 #include <catch2/catch.hpp>
 
 #include "../src/camera.hpp"
-#include "../src/image.hpp"
 #include "../src/light.hpp"
 #include "../src/material.hpp"
+#include "../src/renderer.hpp"
 #include "../src/shape.hpp"
 #include "../src/utils.hpp"
 #include "../src/vectors.hpp"
@@ -12,7 +12,7 @@ TEST_CASE("Final render is unchanged") {
     constexpr int width{20};
     constexpr int height{15};
 
-    Image img{width, height, 1.0f, 1.8f};
+    Renderer renderer{width, height, 1.0f, 1.8f};
 
     PerspectiveCamera camera{
         Point3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 1.0f, -1.0f),
@@ -34,7 +34,7 @@ TEST_CASE("Final render is unchanged") {
     PointLight light{Point3(2.0f, 4.0f, 0.0f), Color(0.5f)};
     lightRack.addLight(&light);
 
-    auto render = img.rayTrace(camera, scene, lightRack);
+    auto render = renderer.rayTrace(camera, scene, lightRack);
     std::vector<int> expected{
         0,   0,   0,  0,  0,  0,  0,   0,  0,  0,   0,   0,   0,   0,   0,   0,
         0,   0,   0,  0,  0,  0,  0,   0,  0,  0,   0,   0,   0,   0,   0,   0,
