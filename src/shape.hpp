@@ -1,16 +1,19 @@
 #ifndef SHAPE_HPP
 #define SHAPE_HPP
 
+#include <optional>
 #include <vector>
 
 #include "material.hpp"
 #include "ray.hpp"
 #include "vectors.hpp"
 
+class Intersection;
+
 class IIntersectable {
    public:
-    virtual bool intersect(Ray &ray) const = 0;
-    virtual ~IIntersectable() {}
+    virtual std::optional<Intersection> intersect(Ray &ray) const = 0;
+    virtual ~IIntersectable() = default;
 };
 
 class Scene : public IIntersectable {
@@ -19,10 +22,10 @@ class Scene : public IIntersectable {
 
    public:
     Scene();
-    virtual ~Scene() {}
+    ~Scene() override = default;
 
     void addShape(Shape *shape);
-    virtual bool intersect(Ray &ray) const override;
+    std::optional<Intersection> intersect(Ray &ray) const override;
 };
 
 class Shape : public IIntersectable {
@@ -47,7 +50,7 @@ class Plane : public Shape {
     Plane(const Point3 &position, const Vector3 &normal,
           const Material &material = Material());
 
-    bool intersect(Ray &ray) const override;
+    std::optional<Intersection> intersect(Ray &ray) const override;
 };
 
 class Sphere : public Shape {
@@ -59,7 +62,7 @@ class Sphere : public Shape {
     Sphere(const Point3 &centre, float radius,
            const Material &material = Material());
 
-    bool intersect(Ray &ray) const override;
+    std::optional<Intersection> intersect(Ray &ray) const override;
 };
 
 #endif

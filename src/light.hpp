@@ -6,7 +6,7 @@
 #include "material.hpp"
 #include "vectors.hpp"
 
-class Ray;
+class Intersection;
 class Scene;
 class Camera;
 
@@ -14,8 +14,8 @@ class ILight {
    public:
     virtual ~ILight() = default;
 
-    virtual Color illuminate(const Ray& intersectedRay, const Scene& scene,
-                             const Camera& cam) const = 0;
+    virtual Color illuminate(const Intersection& intersection,
+                             const Scene& scene, const Camera& cam) const = 0;
 };
 
 class LightRack : public ILight {
@@ -26,7 +26,7 @@ class LightRack : public ILight {
     explicit LightRack(const Color& ambient = 0.5f);
 
     void addLight(ILight* pLight);
-    Color illuminate(const Ray& intersectedRay, const Scene& scene,
+    Color illuminate(const Intersection& intersection, const Scene& scene,
                      const Camera& cam) const override;
 };
 
@@ -37,7 +37,7 @@ class PointLight : public ILight {
    public:
     PointLight(const Point3& origin, const Color& color);
 
-    Color illuminate(const Ray& intersectedRay, const Scene& scene,
+    Color illuminate(const Intersection& intersection, const Scene& scene,
                      const Camera& cam) const override;
 };
 

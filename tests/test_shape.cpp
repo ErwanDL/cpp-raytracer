@@ -9,9 +9,9 @@ TEST_CASE("Plane") {
         const Plane plane{Point3(1.0f, 0.5f, 0.0f), Vector3(1.0f, 0.0f, 0.0f)};
         Ray ray{Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)};
 
-        bool hasIntersected = plane.intersect(ray);
+        auto intersection = plane.intersect(ray);
 
-        REQUIRE(hasIntersected == false);
+        REQUIRE(!intersection);
     }
     SECTION(
         "intersect returns false if plane isnt parallel but is behind ray "
@@ -19,9 +19,9 @@ TEST_CASE("Plane") {
         const Plane plane{Point3(0.0f, -1.0f, 0.0f), Vector3(1.0f, 1.0f, 0.0f)};
         Ray ray{Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)};
 
-        bool hasIntersected = plane.intersect(ray);
+        auto intersection = plane.intersect(ray);
 
-        REQUIRE(hasIntersected == false);
+        REQUIRE(!intersection);
     }
 
     SECTION(
@@ -30,10 +30,10 @@ TEST_CASE("Plane") {
         const Plane plane{Point3(0.0f, 2.0f, 0.0f), Vector3(1.0f, 1.0f, 0.0f)};
         Ray ray{Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)};
 
-        bool hasIntersected = plane.intersect(ray);
+        auto intersection = plane.intersect(ray);
 
-        REQUIRE(hasIntersected == true);
-        REQUIRE(ray.pointOfIntersection() == Point3(0.0f, 2.0f, 0.0f));
+        REQUIRE(intersection);
+        REQUIRE(intersection.value().location == Point3(0.0f, 2.0f, 0.0f));
     }
 }
 
@@ -42,18 +42,18 @@ TEST_CASE("Sphere") {
         const Sphere sphere{Point3(-1.5f, 3.0f, 0.0f), 1.0f};
         Ray ray{Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)};
 
-        bool hasIntersected = sphere.intersect(ray);
+        auto intersection = sphere.intersect(ray);
 
-        REQUIRE(hasIntersected == false);
+        REQUIRE(!intersection);
     }
 
     SECTION("intersect returns false if sphere is fully behind ray origin") {
         const Sphere sphere{Point3(-1.5f, -2.0f, 0.0f), 1.0f};
         Ray ray{Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)};
 
-        bool hasIntersected = sphere.intersect(ray);
+        auto intersection = sphere.intersect(ray);
 
-        REQUIRE(hasIntersected == false);
+        REQUIRE(!intersection);
     }
 
     SECTION(
@@ -62,11 +62,12 @@ TEST_CASE("Sphere") {
         const Sphere sphere{Point3(-0.5f, 2.0f, 0.0f), 1.0f};
         Ray ray{Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)};
 
-        bool hasIntersected = sphere.intersect(ray);
+        auto intersection = sphere.intersect(ray);
 
         float expectedIntersectionY = 2.0f - std::sqrt(3.0f) / 2.0f;
-        REQUIRE(hasIntersected == true);
-        REQUIRE(ray.pointOfIntersection() ==
+
+        REQUIRE(intersection);
+        REQUIRE(intersection.value().location ==
                 Point3(0.0f, expectedIntersectionY, 0.0f));
     }
 
@@ -76,9 +77,9 @@ TEST_CASE("Sphere") {
         const Sphere sphere{Point3(0.0f, -0.5f, 0.0f), 1.0f};
         Ray ray{Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)};
 
-        bool hasIntersected = sphere.intersect(ray);
+        auto intersection = sphere.intersect(ray);
 
-        REQUIRE(hasIntersected == true);
-        REQUIRE(ray.pointOfIntersection() == Point3(0.0f, 0.5f, 0.0f));
+        REQUIRE(intersection);
+        REQUIRE(intersection.value().location == Point3(0.0f, 0.5f, 0.0f));
     }
 }

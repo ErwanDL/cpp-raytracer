@@ -1,23 +1,33 @@
 #include "shape.hpp"
 
 #include <cmath>
+#include <optional>
 
+#include "ray.hpp"
 #include "utils.hpp"
 
 // CLASS SCENE
 
-Scene::Scene() {}
+Scene::Scene() = default;
 
 void Scene::addShape(Shape *pShape) { shapes.push_back(pShape); }
 
-bool Scene::intersect(Ray &ray) const {
+std::optional<Intersection> Scene::intersect(Ray &ray) const {
     bool doesIntersect{false};
 
+    std::optional<Intersection> closestIntersection;
+
     for (const Shape *pShape : shapes) {
-        if (pShape->intersect(ray)) doesIntersect = true;
+        const auto &intersection = pShape->intersect(ray);
+        if (!closestIntersection ||
+            (intersection &&
+             (intersection->location - ray.getOrigin()).length() <
+                 (closestIntersection->location - ray.getOrigin()).length())) {
+            closestIntersection = intersection;
+        }
     }
 
-    return doesIntersect;
+    return closestIntersection;
 }
 
 // CLASS SHAPE
@@ -34,22 +44,22 @@ Plane::Plane(const Point3 &position, const Vector3 &normal,
              const Material &material)
     : Shape(material), position(position), normal(normal) {}
 
-bool Plane::intersect(Ray &ray) const {
+std::optional<Intersection> Plane::intersect(Ray &ray) const {
     float dDotN{normal.dot(ray.getDirection())};
 
-    if (dDotN == 0.0f) return false;
+    if (dDotN == 0.0f) {
+        return {};
+    }
 
     const float t{normal.dot(position - ray.getOrigin()) / dDotN};
 
-    Intersection &i = ray.getIntersection();
-
-    if (t <= Intersection::MIN_RAY_DIST || t >= i.getDistance()) return false;
+    if (t <= Ray::MIN_RAY_DIST || t > ray.maxDist) {
+        return {};
+    }
+    Point3 intersectionLocation{ray.getOrigin() +
+                                t * ray.getDirection().normalized()};
     Vector3 intersectionNormal{dDotN > 0.0f ? -normal : normal};
-    i.setNormal(intersectionNormal);
-    i.setDistance(t);
-    i.setPShape(this);
-
-    return true;
+    return Intersection(intersectionLocation, intersectionNormal, *this, ray);
 }
 
 // CLASS SPHERE
@@ -57,7 +67,7 @@ bool Plane::intersect(Ray &ray) const {
 Sphere::Sphere(const Point3 &centre, float radius, const Material &material)
     : Shape(material), centre(centre), radius(radius) {}
 
-bool Sphere::intersect(Ray &ray) const {
+std::optional<Intersection> Sphere::intersect(Ray &ray) const {
     // float a{ray.getDirection().lengthSquared()}; always equal to 1
     float a{1.0f};
     float b{2 * ray.getDirection().dot(ray.getOrigin() - centre)};
@@ -66,21 +76,25 @@ bool Sphere::intersect(Ray &ray) const {
     float discriminant{Math::sqr(b) - 4 * a * c};
 
     if (discriminant <= 0.0f)  // if no solution to equation
-        return false;
+    {
+        return {};
+    }
 
     float t1{(-b - std::sqrt(discriminant)) / (2 * a)};
     float t2{(-b + std::sqrt(discriminant)) / (2 * a)};
 
-    Intersection &i{ray.getIntersection()};
-
-    // we check t1 first because it is always closer than t2
-    if (t1 > Intersection::MIN_RAY_DIST && t1 < i.getDistance())
-        i.setDistance(t1);
-    else if (t2 > Intersection::MIN_RAY_DIST && t2 < i.getDistance())
-        i.setDistance(t2);
-    else
-        return false;
-    i.setPShape(this);
-    i.setNormal((ray.pointOfIntersection() - centre).normalized());
-    return true;
+    Point3 intersectionLocation{0.0f};
+    // since t1 always <= t2, we check t1 first
+    if (t1 > Ray::MIN_RAY_DIST && t1 < ray.maxDist) {
+        intersectionLocation =
+            ray.getOrigin() + t1 * ray.getDirection().normalized();
+    } else if (t2 > Ray::MIN_RAY_DIST && t2 < ray.maxDist) {
+        intersectionLocation =
+            ray.getOrigin() + t2 * ray.getDirection().normalized();
+    } else {
+        return {};
+    }
+    return Intersection(intersectionLocation,
+                        (intersectionLocation - centre).normalized(), *this,
+                        ray);
 }

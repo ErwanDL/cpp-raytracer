@@ -30,9 +30,10 @@ std::vector<int> Renderer::rayTrace(const Camera &camera, Scene &scene,
                 -2.0f * static_cast<float>(y) / static_cast<float>(height) +
                     1.0f};
             Ray ray{camera.makeRay(screenCoord)};
-            if (scene.intersect(ray)) {
+            const auto intersection = scene.intersect(ray);
+            if (intersection) {
                 Color intersectionColor{
-                    lightRack.illuminate(ray, scene, camera)};
+                    lightRack.illuminate(intersection.value(), scene, camera)};
                 setPixel(pixelValues, y, x,
                          intersectionColor.applyGamma(exposure, gamma).clamp());
             }
