@@ -14,15 +14,17 @@ Renderer::Renderer(int width, int height, float exposure, float gamma)
 void Renderer::setPixel(std::vector<int> &pixelValues, int row, int col,
                         const Color &color) {
     int redIndex{width * row * 3 + col * 3};
-    pixelValues.at(redIndex) = static_cast<int>(std::round(color.r * 255));
-    pixelValues.at(redIndex + 1) = static_cast<int>(std::round(color.g * 255));
-    pixelValues.at(redIndex + 2) = static_cast<int>(std::round(color.b * 255));
+    pixelValues.at(redIndex) = static_cast<int>(std::round(color.getR() * 255));
+    pixelValues.at(redIndex + 1) =
+        static_cast<int>(std::round(color.getG() * 255));
+    pixelValues.at(redIndex + 2) =
+        static_cast<int>(std::round(color.getB() * 255));
 }
 
 std::vector<int> Renderer::rayTrace(const Camera &camera, Scene &scene,
                                     const LightRack &lightRack) {
     std::vector<int> pixelValues(width * height * 3, 0);
-
+    Point3 observerLocation{camera.getLocation()};
     for (int x{0}; x < width; ++x) {
         for (int y{0}; y < height; ++y) {
             const Vector2 screenCoord{
@@ -32,10 +34,10 @@ std::vector<int> Renderer::rayTrace(const Camera &camera, Scene &scene,
             Ray ray{camera.makeRay(screenCoord)};
             const auto intersection = scene.intersect(ray);
             if (intersection) {
-                Color intersectionColor{
-                    lightRack.illuminate(intersection.value(), scene, camera)};
+                Color intersectionColor{lightRack.illuminate(
+                    intersection.value(), scene, observerLocation)};
                 setPixel(pixelValues, y, x,
-                         intersectionColor.applyGamma(exposure, gamma).clamp());
+                         intersectionColor.gammaCorrected(exposure, gamma));
             }
         }
     }

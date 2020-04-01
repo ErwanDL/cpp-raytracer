@@ -37,7 +37,7 @@ int main() {
                    Material(Color(0.7f, 0.7f, 0.0f))};
     scene.addShape(&sphere2);
 
-    LightRack lightRack{0.6f};
+    LightRack lightRack{Color(0.6f)};
 
     PointLight light{Point3(2.0f, 4.0f, 0.0f), Color(0.5f)};
     lightRack.addLight(&light);

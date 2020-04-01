@@ -5,25 +5,25 @@
 #include "ray.hpp"
 #include "vectors.hpp"
 
-PerspectiveCamera::PerspectiveCamera(const Point3 &origin,
+PerspectiveCamera::PerspectiveCamera(const Point3 &location,
                                      const Vector3 &target,
                                      const Vector3 &upguide, float fov,
                                      float aspectRatio)
-    : origin(origin),
-      forward((target - origin).normalized()),
+    : location(location),
+      forward((target - location).normalized()),
       height(std::tan(fov)),
       right(0.0f),
-      up(0.0f) {
+      up(0.0f),
+      width(0.0f) {
     right = forward.cross(upguide).normalized();
-    up = right.cross(forward);
+    up = right.cross(forward);  // upguide is not necessarily colinear to up
     width = height * aspectRatio;
 }
 
 Ray PerspectiveCamera::makeRay(const Point2 &point) const {
     Vector3 direction{forward + point.getU() * width * right +
                       point.getV() * height * up};
-    direction.normalize();
-    return Ray(origin, direction);
+    return Ray(location, direction);
 }
 
-const Point3 &PerspectiveCamera::getOrigin() const { return origin; }
+const Point3 &PerspectiveCamera::getLocation() const { return location; }

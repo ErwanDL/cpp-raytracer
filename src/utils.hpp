@@ -25,6 +25,10 @@ bool floatingPointEquality(T a, T b) {
     // Otherwise fall back to Knuth's algorithm
     return (diff <= (std::max(std::abs(a), std::abs(b)) * relEpsilon));
 }
+template <typename T>
+T unitClamp(T x) {
+    return std::clamp(x, static_cast<T>(0), static_cast<T>(1));
+}
 }  // namespace Math
 
 #endif

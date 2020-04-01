@@ -9,36 +9,31 @@
 #include "vectors.hpp"
 
 class Intersection;
+class Shape;
 
-class IIntersectable {
+class Intersectable {
    public:
     virtual std::optional<Intersection> intersect(Ray &ray) const = 0;
-    virtual ~IIntersectable() = default;
 };
 
-class Scene : public IIntersectable {
+class Scene : public Intersectable {
    private:
     std::vector<Shape *> shapes{};
 
    public:
     Scene();
-    ~Scene() override = default;
 
     void addShape(Shape *shape);
     std::optional<Intersection> intersect(Ray &ray) const override;
 };
 
-class Shape : public IIntersectable {
-   protected:
+class Shape : public Intersectable {
+   private:
     Material material;
 
    public:
-    Shape(const Material &material);
-    virtual ~Shape() {}
-
+    explicit Shape(const Material &material);
     const Material &getMaterial() const;
-
-    void setMaterial(const Material &newMaterial);
 };
 
 class Plane : public Shape {

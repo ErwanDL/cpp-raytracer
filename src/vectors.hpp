@@ -56,7 +56,7 @@ class Vector2 {
     Vector2 &operator-=(const Vector2 &other);
     Vector2 &operator*=(float f);
     Vector2 &operator/=(float f);
-    bool operator==(const Vector2 &other);
+    bool operator==(const Vector2 &other) const;
 
     float getU() const;
     float getV() const;

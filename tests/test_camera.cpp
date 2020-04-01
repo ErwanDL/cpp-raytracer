@@ -14,8 +14,8 @@ TEST_CASE("PerspectiveCamera") {
 
         const auto ray = cam.makeRay(Point2(1.0f, 0.0f));
 
-        REQUIRE(ray.getOrigin() == Point3(0.0f));
-        REQUIRE(ray.getDirection().normalized() ==
+        REQUIRE(ray.origin == Point3(0.0f));
+        REQUIRE(ray.direction.normalized() ==
                 Vector3(0.5f, std::sqrt(3.0f) / 2.0f, 0.0f).normalized());
     }
 }

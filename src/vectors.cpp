@@ -142,7 +142,7 @@ Vector2 &Vector2::operator/=(float f) {
     return *this;
 }
 
-bool Vector2::operator==(const Vector2 &other) {
+bool Vector2::operator==(const Vector2 &other) const {
     return Math::floatingPointEquality(u, other.u) &&
            Math::floatingPointEquality(v, other.v);
 }
