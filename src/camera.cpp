@@ -6,7 +6,7 @@
 #include "vectors.hpp"
 
 PerspectiveCamera::PerspectiveCamera(const Point3 &location,
-                                     const Vector3 &target,
+                                     const Point3 &target,
                                      const Vector3 &upguide, float fov,
                                      float aspectRatio)
     : location(location),

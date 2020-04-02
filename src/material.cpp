@@ -20,7 +20,7 @@ Color::Color(float red, float green, float blue) {
     b = Math::unitClamp(blue);
 }
 
-Color Color::gammaCorrected(float exposure, float gamma) {
+Color Color::gammaCorrected(float exposure, float gamma) const {
     float red = Math::unitClamp(std::pow(r * exposure, gamma));
     float green = Math::unitClamp(std::pow(g * exposure, gamma));
     float blue = Math::unitClamp(std::pow(b * exposure, gamma));

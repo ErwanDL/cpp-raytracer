@@ -12,7 +12,7 @@ struct Color final {
     explicit Color(float f);
     Color(float red, float green, float blue);
 
-    Color gammaCorrected(float exposure, float gamma);
+    Color gammaCorrected(float exposure, float gamma) const;
 
     Color &operator+=(const Color &other);
     bool operator==(const Color &other) const;

@@ -21,7 +21,7 @@ class PerspectiveCamera : public Camera {
     float width;
 
    public:
-    PerspectiveCamera(const Point3 &location, const Vector3 &target,
+    PerspectiveCamera(const Point3 &location, const Point3 &target,
                       const Vector3 &upguide, float fov, float aspectRatio);
     Ray makeRay(const Point2 &point) const override;
 

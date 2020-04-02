@@ -11,10 +11,10 @@
 
 LightRack::LightRack(const Color& ambient) : ambient(ambient) {}
 
-void LightRack::addLight(Light* pLight) { lights.push_back(pLight); }
+void LightRack::addLight(const Light& light) { lights.push_back(&light); }
 
 Color LightRack::illuminate(const Intersection& intersection,
-                            const Scene& scene,
+                            const Intersectable& scene,
                             const Point3& observerLocation) const {
     const Material& material{intersection.material};
     Color resultingColor{0.0f};
@@ -34,7 +34,7 @@ PointLight::PointLight(const Point3& origin, const Color& color)
     : origin(origin), color(color) {}
 
 Color PointLight::illuminate(const Intersection& intersection,
-                             const Scene& scene,
+                             const Intersectable& scene,
                              const Point3& observerLocation) const {
     const Vector3 towardsLight = (origin - intersection.location).normalized();
     const float lightDotN = towardsLight.dot(intersection.normal);

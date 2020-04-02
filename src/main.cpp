@@ -10,42 +10,52 @@
 #include "vectors.hpp"
 
 int main() {
-    constexpr int width{1280};
-    constexpr int height{720};
-
-    Renderer renderer{width, height, 1.0f, 1.8f};
-
-    PerspectiveCamera camera{
-        Point3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 1.0f, -1.0f),
-        Vector3(0.0f, 1.0f, 0.0f), Math::PI / 6,
-        static_cast<float>(width) / static_cast<float>(height)};
-
     Scene scene{};
 
-    Plane floor(Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f),
-                Material(Color(0.3f, 0.5f, 0.3f), 0.1f, 5.0f));
+    const Plane floor(Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f),
+                      Material(Color(0.3f, 0.5f, 0.3f), 0.0f));
     scene.addShape(&floor);
 
-    Plane backwall(Point3(0.0f, 0.0f, -15.0f), Vector3(0.0f, 0.0f, 1.0f),
-                   Material(Color(0.5f, 0.3f, 0.3f), 0.1f, 5.0f));
-    scene.addShape(&backwall);
+    const Sphere blueSphere{Point3(-2.0f, 1.0f, -5.0f), 0.95f,
+                            Material(Color(0.4f, 0.5f, 0.8f), 0.05f)};
+    scene.addShape(&blueSphere);
 
-    Sphere sphere{Point3(1.0f, 2.5f, -5.0f), 0.7f,
-                  Material(Color(0.5f, 0.5f, 0.8f))};
-    scene.addShape(&sphere);
-    Sphere sphere2{Point3(-1.5f, 0.5f, -2.5f), 0.5f,
-                   Material(Color(0.7f, 0.7f, 0.0f))};
-    scene.addShape(&sphere2);
+    const Sphere metalSphere{Point3(0.0f, 1.0f, -5.0f), 0.95f,
+                             Material(Color(0.0f), 0.8f, 100.0f)};
+    scene.addShape(&metalSphere);
 
-    LightRack lightRack{Color(0.6f)};
+    const Sphere metalSphere2{Point3(-2.0f, 1.0f, -7.0f), 0.95f,
+                              Material(Color(0.0f), 0.8f, 100.0f)};
+    scene.addShape(&metalSphere2);
 
-    PointLight light{Point3(2.0f, 4.0f, 0.0f), Color(0.5f)};
-    lightRack.addLight(&light);
+    const Sphere yellowSphere{Point3(2.0f, 1.5f, -5.0f), 0.95f,
+                              Material(Color(0.7f, 0.7f, 0.4f), 0.0f)};
+    scene.addShape(&yellowSphere);
 
-    PointLight light2{Point3(-1.0f, 10.0f, -5.0f), Color(0.25f)};
-    lightRack.addLight(&light2);
+    const Sphere redSphere{Point3(-0.5f, 2.0f, -2.0f), 0.95f,
+                           Material(Color(0.65f, 0.35f, 0.35f), 0.0f)};
+    scene.addShape(&redSphere);
 
-    auto render = renderer.rayTrace(camera, scene, lightRack);
+    const Sphere orangeSphere{Point3(0.5f, 2.0f, -7.5f), 0.95f,
+                              Material(Color(0.7f, 0.45f, 0.35f), 0.0f)};
+    scene.addShape(&orangeSphere);
+
+    LightRack lightRack{Color(0.7f)};
+
+    const PointLight light{Point3(2.0f, 14.0f, 0.0f), Color(0.8f)};
+    lightRack.addLight(light);
+
+    constexpr int width{720};
+    constexpr int height{480};
+
+    PerspectiveCamera camera{
+        Point3(0.0f, 10.0f, 0.0f), Vector3(0.0f, 1.0f, -5.0f),
+        Vector3(0.0f, 1.0f, 0.0f), Math::PI / 8,
+        static_cast<float>(width) / static_cast<float>(height)};
+
+    Renderer renderer{scene, lightRack, width, height, 1.0f, 1.8f};
+
+    auto render = renderer.rayTrace(camera);
     renderer.saveRenderer(render, "scene.ppm");
 
     return 0;

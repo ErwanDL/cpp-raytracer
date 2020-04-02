@@ -6,31 +6,51 @@
 
 #include "light.hpp"
 #include "shape.hpp"
+#include "utils.hpp"
 #include "vectors.hpp"
 
-Renderer::Renderer(int width, int height, float exposure, float gamma)
-    : width(width), height(height), exposure(exposure), gamma(gamma) {}
+Renderer::Renderer(const Intersectable &scene, const Light &lights, int width,
+                   int height, float exposure, float gamma)
+    : scene(scene),
+      lights(lights),
+      width(width),
+      height(height),
+      exposure(exposure),
+      gamma(gamma) {}
 
-std::vector<int> Renderer::rayTrace(const Camera &camera, Scene &scene,
-                                    const LightRack &lightRack) {
+std::vector<int> Renderer::rayTrace(const Camera &camera) {
     std::vector<int> pixelValues(width * height * 3, 0);
-    Point3 observerLocation{camera.getLocation()};
 
     for (int x{0}; x < width; ++x) {
         for (int y{0}; y < height; ++y) {
             const Vector2 screenCoord = screenCoordinateFromXY(x, y);
-            Ray ray = camera.makeRay(screenCoord);
-            const auto intersection = scene.intersect(ray);
-            if (intersection) {
-                Color intersectionColor = lightRack.illuminate(
-                    intersection.value(), scene, observerLocation);
-                setPixel(pixelValues, y, x,
-                         intersectionColor.gammaCorrected(exposure, gamma));
-            }
+            const Ray initialRay = camera.makeRay(screenCoord);
+            const Color pixelColor = shootRayRecursively(initialRay, 4);
+            setPixel(pixelValues, y, x,
+                     pixelColor.gammaCorrected(exposure, gamma));
         }
     }
 
     return pixelValues;
+}
+
+Color Renderer::shootRayRecursively(const Ray &ray, int nReflexions) const {
+    const auto intersection = scene.intersect(ray);
+    if (!intersection) {
+        return Color(0.5f, 0.8f, 0.9f);
+    }
+    const Color intersectionColor =
+        lights.illuminate(intersection.value(), scene, ray.origin);
+
+    if (nReflexions == 0 ||
+        Math::floatingPointEquality(intersection->material.specular, 0.0f)) {
+        return intersectionColor;
+    }
+    const Ray reflectedRay{intersection->location,
+                           (-ray.direction).reflected(intersection->normal)};
+    return intersectionColor +
+           intersection->material.specular *
+               shootRayRecursively(reflectedRay, nReflexions - 1);
 }
 
 Vector2 Renderer::screenCoordinateFromXY(int x, int y) const {

@@ -7,25 +7,26 @@
 #include "vectors.hpp"
 
 struct Intersection;
-class Scene;
+class Intersectable;
 class Camera;
 
 class Light {
    public:
     virtual Color illuminate(const Intersection& intersection,
-                             const Scene& scene,
+                             const Intersectable& scene,
                              const Point3& observerLocation) const = 0;
 };
 
 class LightRack : public Light {
-    std::vector<Light*> lights{};
+    std::vector<const Light*> lights{};
     Color ambient;
 
    public:
     explicit LightRack(const Color& ambient = Color(0.5f));
 
-    void addLight(Light* pLight);
-    Color illuminate(const Intersection& intersection, const Scene& scene,
+    void addLight(const Light& light);
+    Color illuminate(const Intersection& intersection,
+                     const Intersectable& scene,
                      const Point3& observerLocation) const override;
 };
 
@@ -36,7 +37,8 @@ class PointLight : public Light {
    public:
     PointLight(const Point3& origin, const Color& color);
 
-    Color illuminate(const Intersection& intersection, const Scene& scene,
+    Color illuminate(const Intersection& intersection,
+                     const Intersectable& scene,
                      const Point3& observerLocation) const override;
 
    private:
