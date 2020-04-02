@@ -45,8 +45,8 @@ int main() {
     const PointLight light{Point3(2.0f, 14.0f, 0.0f), Color(0.8f)};
     lightRack.addLight(light);
 
-    constexpr int width{720};
-    constexpr int height{480};
+    constexpr int width{1280};
+    constexpr int height{720};
 
     PerspectiveCamera camera{
         Point3(0.0f, 10.0f, 0.0f), Vector3(0.0f, 1.0f, -5.0f),
