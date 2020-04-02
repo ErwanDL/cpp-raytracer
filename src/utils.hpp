@@ -2,6 +2,8 @@
 #define UTILS_HPP
 #include <algorithm>
 #include <cmath>
+#include <optional>
+#include <utility>
 
 namespace Math {
 template <typename T>
@@ -25,9 +27,28 @@ bool floatingPointEquality(T a, T b) {
     // Otherwise fall back to Knuth's algorithm
     return (diff <= (std::max(std::abs(a), std::abs(b)) * relEpsilon));
 }
+
 template <typename T>
 T unitClamp(T x) {
     return std::clamp(x, static_cast<T>(0), static_cast<T>(1));
+}
+
+/*
+ * Returns false if the equation has no solution, returns a pair (t1, t2) with
+ * t1 <= t2 else.
+ */
+inline std::optional<std::pair<float, float>>
+solveSecondDegreeEquation(  // NOLINT(misc-definitions-in-headers)
+    float a, float b, float c) {
+    float discriminant{Math::sqr(b) - 4 * a * c};
+
+    if (discriminant < 0.0f) {
+        return {};
+    }
+
+    float t1{(-b - std::sqrt(discriminant)) / (2 * a)};
+    float t2{(-b + std::sqrt(discriminant)) / (2 * a)};
+    return std::make_pair(t1, t2);
 }
 }  // namespace Math
 

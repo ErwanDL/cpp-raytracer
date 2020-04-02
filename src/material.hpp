@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-class Color final {
+struct Color final {
     float r;
     float g;
     float b;
@@ -16,20 +16,13 @@ class Color final {
 
     Color &operator+=(const Color &other);
     bool operator==(const Color &other) const;
-
-    friend Color operator*(const Color &c1, const Color &c2);
-    friend Color operator*(float f, const Color &c);
-    friend Color operator*(const Color &c, float f);
-    friend Color operator+(const Color &c1, const Color &c2);
-    friend std::ostream &operator<<(std::ostream &out, const Color &color);
-
-    float getR() const;
-    float getG() const;
-    float getB() const;
-
-   private:
-    Color &clamp();
 };
+
+Color operator*(const Color &c1, const Color &c2);
+Color operator*(float f, const Color &c);
+Color operator*(const Color &c, float f);
+Color operator+(const Color &c1, const Color &c2);
+std::ostream &operator<<(std::ostream &out, const Color &color);
 
 struct Material final {
     Color color;

@@ -8,23 +8,23 @@
 #include "ray.hpp"
 #include "vectors.hpp"
 
-class Intersection;
+struct Intersection;
 class Shape;
 
 class Intersectable {
    public:
-    virtual std::optional<Intersection> intersect(Ray &ray) const = 0;
+    virtual std::optional<Intersection> intersect(const Ray &ray) const = 0;
 };
 
 class Scene : public Intersectable {
    private:
-    std::vector<Shape *> shapes{};
+    std::vector<const Shape *> shapes{};
 
    public:
     Scene();
 
-    void addShape(Shape *shape);
-    std::optional<Intersection> intersect(Ray &ray) const override;
+    void addShape(const Shape *shape);
+    std::optional<Intersection> intersect(const Ray &ray) const override;
 };
 
 class Shape : public Intersectable {
@@ -33,7 +33,7 @@ class Shape : public Intersectable {
 
    public:
     explicit Shape(const Material &material);
-    const Material &getMaterial() const;
+    Material getMaterial() const;
 };
 
 class Plane : public Shape {
@@ -45,7 +45,7 @@ class Plane : public Shape {
     Plane(const Point3 &position, const Vector3 &normal,
           const Material &material = Material());
 
-    std::optional<Intersection> intersect(Ray &ray) const override;
+    std::optional<Intersection> intersect(const Ray &ray) const override;
 };
 
 class Sphere : public Shape {
@@ -57,7 +57,7 @@ class Sphere : public Shape {
     Sphere(const Point3 &centre, float radius,
            const Material &material = Material());
 
-    std::optional<Intersection> intersect(Ray &ray) const override;
+    std::optional<Intersection> intersect(const Ray &ray) const override;
 };
 
 #endif

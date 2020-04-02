@@ -2,7 +2,7 @@
 #define CAMERA_HPP
 #include "vectors.hpp"
 
-class Ray;
+struct Ray;
 
 class Camera {
    public:

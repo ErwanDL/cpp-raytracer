@@ -20,23 +20,12 @@ Color::Color(float red, float green, float blue) {
     b = Math::unitClamp(blue);
 }
 
-Color &Color::clamp() {
-    r = Math::unitClamp(r);
-    g = Math::unitClamp(g);
-    b = Math::unitClamp(b);
-    return *this;
-}
-
 Color Color::gammaCorrected(float exposure, float gamma) {
-    float red = std::pow(r * exposure, gamma);
-    float green = std::pow(g * exposure, gamma);
-    float blue = std::pow(b * exposure, gamma);
-    return Color(red, green, blue).clamp();
+    float red = Math::unitClamp(std::pow(r * exposure, gamma));
+    float green = Math::unitClamp(std::pow(g * exposure, gamma));
+    float blue = Math::unitClamp(std::pow(b * exposure, gamma));
+    return Color(red, green, blue);
 }
-
-float Color::getR() const { return r; }
-float Color::getG() const { return g; }
-float Color::getB() const { return b; }
 
 Color operator*(const Color &c1, const Color &c2) {
     return Color(c1.r * c2.r, c1.g * c2.g, c1.b * c2.b);
@@ -58,10 +47,10 @@ std::ostream &operator<<(std::ostream &out, const Color &color) {
 }
 
 Color &Color::operator+=(const Color &other) {
-    r += other.r;
-    g += other.g;
-    b += other.b;
-    return this->clamp();
+    r = Math::unitClamp(r + other.r);
+    g += Math::unitClamp(other.g);
+    b += Math::unitClamp(other.b);
+    return *this;
 }
 
 bool Color::operator==(const Color &other) const {

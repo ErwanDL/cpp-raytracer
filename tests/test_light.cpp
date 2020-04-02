@@ -12,7 +12,7 @@ TEST_CASE("PointLight") {
     const Point3 observerLocation(Point3(0.0f));
     SECTION("lights as black if normal is opposed") {
         const Intersection intersection{Point3(0.0f, 1.0f, 0.0f),
-                                        Vector3(1.0f, -2.0f, 0.0f),
+                                        Vector3(1.0f, -2.0f, 0.0f), 1.0f,
                                         Material(Color(0.5f))};
 
         const Color resultingColor{
@@ -23,7 +23,7 @@ TEST_CASE("PointLight") {
 
     SECTION("lights as black if normal is orthogonal") {
         const Intersection intersection{Point3(0.0f, 1.0f, 0.0f),
-                                        Vector3(1.0f, -1.0f, 0.0f),
+                                        Vector3(1.0f, -1.0f, 0.0f), 1.0f,
                                         Material(Color(0.5f))};
 
         const Color resultingColor{
@@ -34,7 +34,7 @@ TEST_CASE("PointLight") {
 
     SECTION("lights as black if a plane is between") {
         const Intersection intersection{Point3(0.0f, 1.0f, 0.0f),
-                                        Vector3(0.0f, 1.0f, 0.0f),
+                                        Vector3(0.0f, 1.0f, 0.0f), 1.0f,
                                         Material(Color(0.5f))};
 
         Scene scene;
@@ -51,7 +51,7 @@ TEST_CASE("PointLight") {
         "lights as diffuse color times light color if normal faces light and "
         "no specular") {
         const Intersection intersection{
-            Point3(0.0f, 5.0f, 3.0f), Vector3(0.0f, 0.0f, -1.0f),
+            Point3(0.0f, 5.0f, 3.0f), Vector3(0.0f, 0.0f, -1.0f), 1.0f,
             Material(Color(1.0f, 0.5f, 0.0f), 0.0f)};
 
         const Color resultingColor{
@@ -67,7 +67,7 @@ TEST_CASE("PointLight") {
         // normal and the light is 0.5
         const Intersection intersection{
             Point3(0.0f, 2.5f, 2.5f / std::sqrt(3.0f)),
-            Vector3(0.0f, 0.0f, -1.0f),
+            Vector3(0.0f, 0.0f, -1.0f), 1.0f,
             // if energy was conserved, the reflectiveness should influence
             // the intensity of the specular highlights -> not the case ATM
             Material(Color(1.0f, 0.5f, 0.0f), 1.0f, 60.0f)};

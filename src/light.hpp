@@ -6,7 +6,7 @@
 #include "material.hpp"
 #include "vectors.hpp"
 
-class Intersection;
+struct Intersection;
 class Scene;
 class Camera;
 

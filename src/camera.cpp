@@ -11,9 +11,9 @@ PerspectiveCamera::PerspectiveCamera(const Point3 &location,
                                      float aspectRatio)
     : location(location),
       forward((target - location).normalized()),
-      height(std::tan(fov)),
-      right(0.0f),
       up(0.0f),
+      right(0.0f),
+      height(std::tan(fov)),
       width(0.0f) {
     right = forward.cross(upguide).normalized();
     up = right.cross(forward);  // upguide is not necessarily colinear to up
