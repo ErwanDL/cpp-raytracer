@@ -1,31 +1,35 @@
 #include "light.hpp"
 
 #include <cmath>
+#include <utility>
+#include <vector>
 
-#include "camera.hpp"
 #include "ray.hpp"
 #include "shape.hpp"
 #include "vectors.hpp"
 
 // CLASS LIGHTRACK
 
-LightRack::LightRack(const Color& ambient) : ambient(ambient) {}
-
 void LightRack::addLight(const Light& light) { lights.push_back(&light); }
 
 Color LightRack::illuminate(const Intersection& intersection,
                             const Intersectable& scene,
                             const Point3& observerLocation) const {
-    const Material& material{intersection.material};
     Color resultingColor{0.0f};
-
-    resultingColor += this->ambient * material.color;
 
     for (const Light* pLight : lights) {
         resultingColor +=
             pLight->illuminate(intersection, scene, observerLocation);
     }
     return resultingColor;
+}
+
+// CLASS AMBIENTLIGHT
+AmbientLight::AmbientLight(const Color& color) : color(color) {}
+
+Color AmbientLight::illuminate(const Intersection& intersection,
+                               const Intersectable&, const Point3&) const {
+    return intersection.material.color * color;
 }
 
 // CLASS POINTLIGHT
@@ -64,7 +68,7 @@ Color PointLight::illuminate(const Intersection& intersection,
 
 Color PointLight::computeDiffuse(float lightDotN,
                                  const Material& material) const {
-    return lightDotN * this->color * material.color * material.diffuse;
+    return lightDotN * this->color * material.color;
 }
 
 Color PointLight::computeSpecular(float observerDotReflected,

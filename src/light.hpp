@@ -18,18 +18,24 @@ class Light {
 };
 
 class LightRack : public Light {
-    std::vector<const Light*> lights{};
-    Color ambient;
+    std::vector<const Light*> lights;
 
    public:
-    explicit LightRack(const Color& ambient = Color(0.5f));
-
     void addLight(const Light& light);
     Color illuminate(const Intersection& intersection,
                      const Intersectable& scene,
                      const Point3& observerLocation) const override;
 };
 
+class AmbientLight : public Light {
+    Color color;
+
+   public:
+    AmbientLight(const Color& color);
+
+    Color illuminate(const Intersection& intersection, const Intersectable&,
+                     const Point3&) const override;
+};
 class PointLight : public Light {
     Point3 origin;
     Color color;

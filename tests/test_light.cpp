@@ -7,6 +7,8 @@
 #include "../src/shape.hpp"
 #include "../src/vectors.hpp"
 
+TEST_CASE("AmbientLight") {}
+
 TEST_CASE("PointLight") {
     const PointLight light{Point3(0.0f, 5.0f, 0.0f), Color(0.5f)};
     const Point3 observerLocation(Point3(0.0f));

@@ -7,16 +7,19 @@
 #include "../src/vectors.hpp"
 
 TEST_CASE("Renderer") {
+    Scene scene;
     const Plane leftPlane{Point3(-1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f),
                           Material(Color(1.0f, 0.0f, 0.0f), 0.5f)};
     const Plane rightPlane{Point3(1.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f),
                            Material(Color(0.0f, 0.0f, 1.0f), 0.5f)};
-    Scene scene;
     scene.addShape(leftPlane);
     scene.addShape(rightPlane);
-    const LightRack lights{Color(0.5f)};
-    const Renderer renderer{scene, lights, 400, 300};
 
+    LightRack lights;
+    const AmbientLight ambientLight{Color(0.5f)};
+    lights.addLight(ambientLight);
+
+    const Renderer renderer{scene, lights, 400, 300};
     const Ray rayTowardsLeftPlane{Point3(0.0f), Vector3(-1.0f, 0.0f, -2.0f)};
 
     SECTION("Shoot ray works correctly with no bounces") {

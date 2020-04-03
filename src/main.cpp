@@ -40,10 +40,13 @@ int main() {
                               Material(Color(0.7f, 0.45f, 0.35f), 0.0f)};
     scene.addShape(orangeSphere);
 
-    LightRack lightRack{Color(0.7f)};
-
+    LightRack lightRack;
+    const AmbientLight ambient{Color(0.5f)};
+    lightRack.addLight(ambient);
     const PointLight light{Point3(2.0f, 14.0f, 0.0f), Color(0.8f)};
     lightRack.addLight(light);
+    const PointLight light2{Point3(-4.0f, 10.0f, -2.0f), Color(0.5f)};
+    lightRack.addLight(light2);
 
     constexpr int width{1280};
     constexpr int height{720};
@@ -53,9 +56,9 @@ int main() {
         Vector3(0.0f, 1.0f, 0.0f), Math::PI / 8,
         static_cast<float>(width) / static_cast<float>(height)};
 
-    Renderer renderer{scene, lightRack, width, height, 1.0f, 1.8f};
+    Renderer renderer{scene, lightRack, width, height};
 
-    auto render = renderer.rayTrace(camera);
+    auto render = renderer.rayTrace(camera, 4);
     renderer.saveRenderer(render, "scene.ppm");
 
     return 0;

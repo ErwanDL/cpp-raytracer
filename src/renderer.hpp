@@ -23,12 +23,12 @@ class Renderer {
     Renderer(const Intersectable &scene, const Light &lights, int width,
              int height, float exposure = 1.0f, float gamma = 2.2f);
 
-    std::vector<int> rayTrace(const Camera &camera);
+    std::vector<int> rayTrace(const Camera &camera, int nReflexions);
 
     void saveRenderer(const std::vector<int> &pixelValues,
                       const std::string &filename) const;
 
-    Color shootRayRecursively(const Ray &ray, int nReflexions) const;
+    Color shootRayRecursively(const Ray &ray, int nReflexionsLeft) const;
 
    private:
     Vector2 screenCoordinateFromXY(int x, int y) const;
