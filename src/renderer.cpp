@@ -37,7 +37,7 @@ std::vector<int> Renderer::rayTrace(const Camera &camera) {
 Color Renderer::shootRayRecursively(const Ray &ray, int nReflexions) const {
     const auto intersection = scene.intersect(ray);
     if (!intersection) {
-        return Color(0.5f, 0.8f, 0.9f);
+        return skyColor;
     }
     const Color intersectionColor =
         lights.illuminate(intersection.value(), scene, ray.origin);
@@ -47,10 +47,11 @@ Color Renderer::shootRayRecursively(const Ray &ray, int nReflexions) const {
         return intersectionColor;
     }
     const Ray reflectedRay{intersection->location,
-                           (-ray.direction).reflected(intersection->normal)};
-    return intersectionColor +
-           intersection->material.specular *
-               shootRayRecursively(reflectedRay, nReflexions - 1);
+                           ray.direction.reflected(intersection->normal)};
+    const Color reflectedColor =
+        intersection->material.specular *
+        shootRayRecursively(reflectedRay, nReflexions - 1);
+    return intersectionColor + reflectedColor;
 }
 
 Vector2 Renderer::screenCoordinateFromXY(int x, int y) const {

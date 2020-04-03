@@ -36,8 +36,8 @@ PointLight::PointLight(const Point3& origin, const Color& color)
 Color PointLight::illuminate(const Intersection& intersection,
                              const Intersectable& scene,
                              const Point3& observerLocation) const {
-    const Vector3 towardsLight = (origin - intersection.location).normalized();
-    const float lightDotN = towardsLight.dot(intersection.normal);
+    const Vector3 fromLight = (intersection.location - origin).normalized();
+    const float lightDotN = -fromLight.dot(intersection.normal);
 
     if (lightDotN <= 0.0f) {
         return Color(0.0f);
@@ -45,7 +45,7 @@ Color PointLight::illuminate(const Intersection& intersection,
 
     // checking if a shape is between the intersection and the light,
     // in which case a shadow is cast
-    Ray rayTowardsLight{intersection.location, towardsLight,
+    Ray rayTowardsLight{intersection.location, -fromLight,
                         (origin - intersection.location).length()};
     if (scene.intersect(rayTowardsLight)) {
         return Color(0.0f);
@@ -54,7 +54,7 @@ Color PointLight::illuminate(const Intersection& intersection,
     const Vector3 towardsCam =
         (observerLocation - intersection.location).normalized();
     const float observerDotReflected =
-        towardsCam.dot(towardsLight.reflected(intersection.normal));
+        towardsCam.dot(fromLight.reflected(intersection.normal));
 
     const Color diffuseColor = computeDiffuse(lightDotN, intersection.material);
     const Color specularColor =

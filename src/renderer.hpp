@@ -10,6 +10,8 @@
 
 struct Color;
 class Renderer {
+    const Color skyColor{0.5f, 0.8f, 0.9f};
+
     const Intersectable &scene;
     const Light &lights;
     int width;
@@ -26,13 +28,13 @@ class Renderer {
     void saveRenderer(const std::vector<int> &pixelValues,
                       const std::string &filename) const;
 
+    Color shootRayRecursively(const Ray &ray, int nReflexions) const;
+
    private:
     Vector2 screenCoordinateFromXY(int x, int y) const;
     void setPixel(std::vector<int> &pixelValues, int row, int col,
                   const Color &color);
     static int convertTo8BitValue(float f);
-
-    Color shootRayRecursively(const Ray &ray, int nReflexions) const;
 };
 
 #endif

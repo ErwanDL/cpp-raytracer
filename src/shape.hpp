@@ -23,7 +23,7 @@ class Scene : public Intersectable {
    public:
     Scene();
 
-    void addShape(const Shape *shape);
+    void addShape(const Shape &shape);
     std::optional<Intersection> intersect(const Ray &ray) const override;
 };
 

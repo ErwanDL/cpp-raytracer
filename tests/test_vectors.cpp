@@ -86,11 +86,11 @@ TEST_CASE("Vector3") {
     }
 
     SECTION("reflected produces correct reflection") {
-        const Vector3 v{1.0f};
+        const Vector3 v{1.0f, 1.0f, -1.0f};
         const Vector3 normal{0.0f, 0.0f, 2.0f};
 
         const auto reflected = v.reflected(normal);
 
-        REQUIRE(reflected == Vector3(-1.0f, -1.0f, 1.0f));
+        REQUIRE(reflected == Vector3(1.0f, 1.0f, 1.0f));
     }
 }

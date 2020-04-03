@@ -99,8 +99,8 @@ TEST_CASE("Scene") {
         Scene scene;
         const Sphere sphere{Point3(3.0f, 5.0f, 0.0f), 1.0f};
         const Plane plane{Point3(0.0f, -1.0f, 0.0f), Vector3(1.0f, 1.0f, 0.0f)};
-        scene.addShape(&sphere);
-        scene.addShape(&plane);
+        scene.addShape(sphere);
+        scene.addShape(plane);
 
         auto intersection = scene.intersect(ray);
 
@@ -112,8 +112,8 @@ TEST_CASE("Scene") {
         Scene scene;
         const Sphere sphere{Point3(3.0f, 5.0f, 0.0f), 1.0f};
         const Plane plane{Point3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 0.0f)};
-        scene.addShape(&sphere);
-        scene.addShape(&plane);
+        scene.addShape(sphere);
+        scene.addShape(plane);
 
         auto intersection = scene.intersect(ray);
 
@@ -127,8 +127,8 @@ TEST_CASE("Scene") {
         Scene scene;
         const Sphere sphere{Point3(0.0f, 5.0f, 0.0f), 1.0f};
         const Plane plane{Point3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 0.0f)};
-        scene.addShape(&sphere);
-        scene.addShape(&plane);
+        scene.addShape(sphere);
+        scene.addShape(plane);
 
         auto intersection = scene.intersect(ray);
 

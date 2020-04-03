@@ -94,7 +94,7 @@ Vector3 Vector3::cross(const Vector3 &other) const {
 
 Vector3 Vector3::reflected(const Vector3 &normal) const {
     const auto normalizedNormal = normal.normalized();
-    return 2 * dot(normalizedNormal) * normalizedNormal - *this;
+    return *this - 2 * dot(normalizedNormal) * normalizedNormal;
 }
 
 float Vector3::getX() const { return x; }

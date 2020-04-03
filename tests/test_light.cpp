@@ -39,7 +39,7 @@ TEST_CASE("PointLight") {
 
         Scene scene;
         Plane plane{Point3(0.0f, 3.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)};
-        scene.addShape(&plane);
+        scene.addShape(plane);
 
         const Color resultingColor{
             light.illuminate(intersection, scene, observerLocation)};

@@ -10,7 +10,7 @@
 
 Scene::Scene() = default;
 
-void Scene::addShape(const Shape *pShape) { shapes.push_back(pShape); }
+void Scene::addShape(const Shape &shape) { shapes.push_back(&shape); }
 
 std::optional<Intersection> Scene::intersect(const Ray &ray) const {
     std::optional<Intersection> closestIntersection;

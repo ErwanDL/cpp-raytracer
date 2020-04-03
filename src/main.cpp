@@ -14,31 +14,31 @@ int main() {
 
     const Plane floor(Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f),
                       Material(Color(0.3f, 0.5f, 0.3f), 0.0f));
-    scene.addShape(&floor);
+    scene.addShape(floor);
 
     const Sphere blueSphere{Point3(-2.0f, 1.0f, -5.0f), 0.95f,
                             Material(Color(0.4f, 0.5f, 0.8f), 0.05f)};
-    scene.addShape(&blueSphere);
+    scene.addShape(blueSphere);
 
     const Sphere metalSphere{Point3(0.0f, 1.0f, -5.0f), 0.95f,
                              Material(Color(0.0f), 0.8f, 100.0f)};
-    scene.addShape(&metalSphere);
+    scene.addShape(metalSphere);
 
     const Sphere metalSphere2{Point3(-2.0f, 1.0f, -7.0f), 0.95f,
                               Material(Color(0.0f), 0.8f, 100.0f)};
-    scene.addShape(&metalSphere2);
+    scene.addShape(metalSphere2);
 
     const Sphere yellowSphere{Point3(2.0f, 1.5f, -5.0f), 0.95f,
                               Material(Color(0.7f, 0.7f, 0.4f), 0.0f)};
-    scene.addShape(&yellowSphere);
+    scene.addShape(yellowSphere);
 
     const Sphere redSphere{Point3(-0.5f, 2.0f, -2.0f), 0.95f,
                            Material(Color(0.65f, 0.35f, 0.35f), 0.0f)};
-    scene.addShape(&redSphere);
+    scene.addShape(redSphere);
 
     const Sphere orangeSphere{Point3(0.5f, 2.0f, -7.5f), 0.95f,
                               Material(Color(0.7f, 0.45f, 0.35f), 0.0f)};
-    scene.addShape(&orangeSphere);
+    scene.addShape(orangeSphere);
 
     LightRack lightRack{Color(0.7f)};
 
