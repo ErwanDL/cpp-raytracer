@@ -33,8 +33,9 @@ class AmbientLight : public Light {
    public:
     AmbientLight(const Color& color);
 
-    Color illuminate(const Intersection& intersection, const Intersectable&,
-                     const Point3&) const override;
+    Color illuminate(const Intersection& intersection,
+                     const Intersectable& scene,
+                     const Point3& observerLocation) const override;
 };
 class PointLight : public Light {
     Point3 origin;

@@ -2,6 +2,7 @@
 #define SHAPE_HPP
 
 #include <optional>
+#include <utility>
 #include <vector>
 
 #include "material.hpp"
@@ -14,6 +15,8 @@ class Shape;
 class Intersectable {
    public:
     virtual std::optional<Intersection> intersect(const Ray &ray) const = 0;
+    virtual std::pair<Point3, float> closestPointTo(
+        const Point3 &point) const = 0;
 };
 
 class Scene : public Intersectable {
@@ -25,6 +28,7 @@ class Scene : public Intersectable {
 
     void addShape(const Shape &shape);
     std::optional<Intersection> intersect(const Ray &ray) const override;
+    std::pair<Point3, float> closestPointTo(const Point3 &point) const override;
 };
 
 class Shape : public Intersectable {
@@ -46,6 +50,7 @@ class Plane : public Shape {
           const Material &material = Material());
 
     std::optional<Intersection> intersect(const Ray &ray) const override;
+    std::pair<Point3, float> closestPointTo(const Point3 &point) const override;
 };
 
 class Sphere : public Shape {
@@ -58,6 +63,7 @@ class Sphere : public Shape {
            const Material &material = Material());
 
     std::optional<Intersection> intersect(const Ray &ray) const override;
+    std::pair<Point3, float> closestPointTo(const Point3 &point) const override;
 };
 
 #endif

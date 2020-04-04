@@ -13,12 +13,8 @@ int main() {
     Scene scene{};
 
     const Plane floor(Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f),
-                      Material(Color(0.3f, 0.5f, 0.3f), 0.0f));
+                      Material(Color(0.35f, 0.3f, 0.3f), 0.0f));
     scene.addShape(floor);
-
-    const Sphere blueSphere{Point3(-2.0f, 1.0f, -5.0f), 0.95f,
-                            Material(Color(0.4f, 0.5f, 0.8f), 0.05f)};
-    scene.addShape(blueSphere);
 
     const Sphere metalSphere{Point3(0.0f, 1.0f, -5.0f), 0.95f,
                              Material(Color(0.0f), 0.8f, 100.0f)};
@@ -28,25 +24,29 @@ int main() {
                               Material(Color(0.0f), 0.8f, 100.0f)};
     scene.addShape(metalSphere2);
 
+    const Sphere blueSphere{Point3(-2.0f, 1.0f, -5.0f), 0.95f,
+                            Material(Color(0.1f, 0.15f, 0.25f), 0.8f)};
+    scene.addShape(blueSphere);
+
     const Sphere yellowSphere{Point3(2.0f, 1.5f, -5.0f), 0.95f,
-                              Material(Color(0.7f, 0.7f, 0.4f), 0.0f)};
+                              Material(Color(0.2f, 0.2f, 0.1f), 0.8f)};
     scene.addShape(yellowSphere);
 
     const Sphere redSphere{Point3(-0.5f, 2.0f, -2.0f), 0.95f,
-                           Material(Color(0.65f, 0.35f, 0.35f), 0.0f)};
+                           Material(Color(0.25f, 0.1f, 0.1f), 0.8f)};
     scene.addShape(redSphere);
 
     const Sphere orangeSphere{Point3(0.5f, 2.0f, -7.5f), 0.95f,
-                              Material(Color(0.7f, 0.45f, 0.35f), 0.0f)};
+                              Material(Color(0.3f, 0.15f, 0.1f), 0.8f)};
     scene.addShape(orangeSphere);
 
     LightRack lightRack;
-    const AmbientLight ambient{Color(0.5f)};
+    const AmbientLight ambient{Color(2.0f)};
     lightRack.addLight(ambient);
-    const PointLight light{Point3(2.0f, 14.0f, 0.0f), Color(0.8f)};
-    lightRack.addLight(light);
-    const PointLight light2{Point3(-4.0f, 10.0f, -2.0f), Color(0.5f)};
-    lightRack.addLight(light2);
+    // const PointLight light{Point3(2.0f, 14.0f, 0.0f), Color(0.8f)};
+    // lightRack.addLight(light);
+    // const PointLight light2{Point3(-5.0f, 10.0f, -2.0f), Color(0.4f)};
+    // lightRack.addLight(light2);
 
     constexpr int width{1280};
     constexpr int height{720};

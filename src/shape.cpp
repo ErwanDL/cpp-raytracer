@@ -1,7 +1,10 @@
 #include "shape.hpp"
 
+#include <algorithm>
 #include <cmath>
+#include <limits>
 #include <optional>
+#include <utility>
 
 #include "ray.hpp"
 #include "utils.hpp"
@@ -27,6 +30,21 @@ std::optional<Intersection> Scene::intersect(const Ray &ray) const {
     return closestIntersection;
 }
 
+std::pair<Point3, float> Scene::closestPointTo(const Point3 &point) const {
+    Point3 closestPoint{point};
+    float closestPointDistance = std::numeric_limits<float>::infinity();
+    for (const auto pShape : shapes) {
+        const auto closestOnShape = pShape->closestPointTo(point);
+        if (closestOnShape.second < closestPointDistance &&
+            !Math::floatingPointEquality(closestOnShape.second, 0.0f)) {
+            closestPointDistance = closestOnShape.second;
+            closestPoint = closestOnShape.first;
+        }
+    }
+
+    return std::pair{closestPoint, closestPointDistance};
+}
+
 // CLASS SHAPE
 
 Shape::Shape(const Material &material) : material(material) {}
@@ -36,7 +54,7 @@ Material Shape::getMaterial() const { return material; }
 
 Plane::Plane(const Point3 &position, const Vector3 &normal,
              const Material &material)
-    : Shape(material), position(position), normal(normal) {}
+    : Shape(material), position(position), normal(normal.normalized()) {}
 
 std::optional<Intersection> Plane::intersect(const Ray &ray) const {
     float dDotN{normal.dot(ray.direction)};
@@ -55,6 +73,12 @@ std::optional<Intersection> Plane::intersect(const Ray &ray) const {
     Vector3 intersectionNormal = dDotN > 0.0f ? -normal : normal;
     return Intersection(intersectionLocation, intersectionNormal, t,
                         this->getMaterial());
+}
+
+std::pair<Point3, float> Plane::closestPointTo(const Point3 &point) const {
+    const float normalComponent = normal.dot(point - position);
+    return std::pair{point - normalComponent * normal,
+                     std::abs(normalComponent)};
 }
 
 // CLASS SPHERE
@@ -88,4 +112,10 @@ std::optional<Intersection> Sphere::intersect(const Ray &ray) const {
     return Intersection(intersectionLocation,
                         (intersectionLocation - centre).normalized(), t,
                         this->getMaterial());
+}
+
+std::pair<Point3, float> Sphere::closestPointTo(const Point3 &point) const {
+    const Vector3 centreToPoint = point - centre;
+    return std::pair{centre + radius * centreToPoint.normalized(),
+                     centreToPoint.length() - radius};
 }

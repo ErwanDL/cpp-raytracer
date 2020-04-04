@@ -1,6 +1,7 @@
 #include "light.hpp"
 
 #include <cmath>
+#include <limits>
 #include <utility>
 #include <vector>
 
@@ -28,8 +29,18 @@ Color LightRack::illuminate(const Intersection& intersection,
 AmbientLight::AmbientLight(const Color& color) : color(color) {}
 
 Color AmbientLight::illuminate(const Intersection& intersection,
-                               const Intersectable&, const Point3&) const {
-    return intersection.material.color * color;
+                               const Intersectable& scene,
+                               const Point3&) const {
+    const auto closest = scene.closestPointTo(intersection.location);
+
+    float occlusionCoeff = 1.0f;
+    if (intersection.normal.dot(closest.first - intersection.location) >
+        0.01f) {
+        occlusionCoeff = 1.0f;
+        // 0.05f * std::sqrt(closest.second / (1 + closest.second));
+    }
+
+    return intersection.material.color * color * occlusionCoeff;
 }
 
 // CLASS POINTLIGHT
