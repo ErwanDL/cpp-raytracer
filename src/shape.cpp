@@ -33,7 +33,7 @@ float Scene::distanceTo(const Intersection &i) const {
     float sumOfInverseDistancesSquared = 0;
     for (const auto pShape : shapes) {
         const float dist = pShape->distanceTo(i);
-        sumOfInverseDistancesSquared += Math::sqr(1 / dist);
+        sumOfInverseDistancesSquared += 1 / (dist * dist);
     }
 
     return 1 / std::sqrt(sumOfInverseDistancesSquared);
@@ -75,10 +75,10 @@ float Plane::distanceTo(const Intersection &i) const {
     }
     const float normalComponent = normal.dot(i.location - position);
     const Point3 closestPointOnPlane = i.location - normalComponent * normal;
-    if (i.normal.dot(closestPointOnPlane - i.location) < 0.0f) {
-        return Math::INF;
-    }
-    return std::abs(normalComponent);
+    const float visibilityCoeff =
+        i.normal.dot((closestPointOnPlane - i.location).normalized());
+
+    return 2.0f * std::abs(normalComponent) / (1.0f + visibilityCoeff);
 }
 
 // CLASS SPHERE
@@ -118,10 +118,12 @@ float Sphere::distanceTo(const Intersection &i) const {
     if ((i.intersectedShape) == this) {
         return Math::INF;
     }
+
     const Vector3 iToCentre = centre - i.location;
-    if (i.normal.dot(iToCentre) <= 0.0f) {
+    const float visibilityCoeff = i.normal.dot(iToCentre.normalized());
+    if (visibilityCoeff <= 0.0f) {
         return Math::INF;
     }
 
-    return iToCentre.length() - radius;
+    return (iToCentre.length() - radius) / visibilityCoeff;
 }

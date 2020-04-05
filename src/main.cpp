@@ -20,7 +20,11 @@ int main() {
                          wallWhite);
     scene.addShape(backWall);
 
-    const Plane ceiling(Point3(0.0f, 6.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f),
+    const Plane cameraWall(Point3(0.0f, 0.0f, 0.5f), Vector3(0.0f, 0.0f, 1.0f),
+                           wallWhite);
+    scene.addShape(cameraWall);
+
+    const Plane ceiling(Point3(0.0f, 9.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f),
                         wallWhite);
     scene.addShape(ceiling);
 
@@ -32,11 +36,11 @@ int main() {
                           Material(Color(0.4f, 0.7f, 0.4f), 0.0f));
     scene.addShape(rightWall);
 
-    const Sphere metalSphere{Point3(-1.0f, 1.0f, -6.0f), 0.95f,
+    const Sphere metalSphere{Point3(-1.0f, 1.0f, -6.0f), 1.0f,
                              Material(Color(0.0f), 0.8f, 100.0f)};
     scene.addShape(metalSphere);
 
-    const Sphere blueSphere{Point3(1.0f, 1.0f, -6.0f), 0.95f,
+    const Sphere blueSphere{Point3(1.0f, 1.0f, -6.0f), 1.0f,
                             Material(Color(0.4f, 0.4f, 0.7f), 0.1f)};
     scene.addShape(blueSphere);
 

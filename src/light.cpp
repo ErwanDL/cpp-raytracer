@@ -36,9 +36,8 @@ Color AmbientLight::illuminate(const Intersection& intersection,
     if (useAmbientOcclusion) {
         const float distanceToClosestShape = scene.distanceTo(intersection);
         if (distanceToClosestShape != Math::INF) {
-            occlusionCoeff =
-                0.5f + 0.5f * std::sqrt(distanceToClosestShape /
-                                        (1 + distanceToClosestShape));
+            occlusionCoeff = 0.6f + 0.4f * (distanceToClosestShape /
+                                            (1 + distanceToClosestShape));
         }
     }
 
