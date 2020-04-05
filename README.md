@@ -37,7 +37,7 @@ If you want to change the rendered scene, you can do so in `src/main.cpp`.
 -   [x] Cast shadows
 -   [x] Specular highlights (Phong illumination model)
 -   [x] Perfect reflections
--   [ ] Ambient occlusion
+-   [x] Ambient occlusion (sort of, full of random heuristics and magic numbers, to replace with actual visibility sampling)
 -   [ ] Glossy reflections
 -   [ ] Texture mapping
 -   [ ] Area lights
