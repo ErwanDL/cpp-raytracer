@@ -7,6 +7,8 @@
 #include "renderer.hpp"
 #include "vectors.hpp"
 
+class Shape;
+
 struct Ray {
     constexpr static float MIN_RAY_DIST{0.001f};
     constexpr static float MAX_RAY_DIST{1.0e30f};
@@ -25,8 +27,12 @@ struct Intersection {
     Vector3 normal;
     float distanceToRayOrigin;
     Material material;
+    const Shape *intersectedShape;
 
     Intersection(Point3 location, const Vector3 &normal,
-                 float distanceToRayOrigin, const Material &material);
+                 float distanceToRayOrigin, const Material &material,
+                 const Shape &intersectedShape);
+
+    Intersection &operator=(const Intersection &other);
 };
 #endif

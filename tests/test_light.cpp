@@ -12,10 +12,11 @@ TEST_CASE("AmbientLight") {}
 TEST_CASE("PointLight") {
     const PointLight light{Point3(0.0f, 5.0f, 0.0f), Color(0.5f)};
     const Point3 observerLocation(Point3(0.0f));
+    const Sphere dummySphere{Point3(0.0f), 0.0f};
     SECTION("lights as black if normal is opposed") {
         const Intersection intersection{Point3(0.0f, 1.0f, 0.0f),
                                         Vector3(1.0f, -2.0f, 0.0f), 1.0f,
-                                        Material(Color(0.5f))};
+                                        Material(Color(0.5f)), dummySphere};
 
         const Color resultingColor{
             light.illuminate(intersection, Scene(), observerLocation)};
@@ -26,7 +27,7 @@ TEST_CASE("PointLight") {
     SECTION("lights as black if normal is orthogonal") {
         const Intersection intersection{Point3(0.0f, 1.0f, 0.0f),
                                         Vector3(1.0f, -1.0f, 0.0f), 1.0f,
-                                        Material(Color(0.5f))};
+                                        Material(Color(0.5f)), dummySphere};
 
         const Color resultingColor{
             light.illuminate(intersection, Scene(), observerLocation)};
@@ -37,7 +38,7 @@ TEST_CASE("PointLight") {
     SECTION("lights as black if a plane is between") {
         const Intersection intersection{Point3(0.0f, 1.0f, 0.0f),
                                         Vector3(0.0f, 1.0f, 0.0f), 1.0f,
-                                        Material(Color(0.5f))};
+                                        Material(Color(0.5f)), dummySphere};
 
         Scene scene;
         Plane plane{Point3(0.0f, 3.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f)};
@@ -54,7 +55,7 @@ TEST_CASE("PointLight") {
         "no specular") {
         const Intersection intersection{
             Point3(0.0f, 5.0f, 3.0f), Vector3(0.0f, 0.0f, -1.0f), 1.0f,
-            Material(Color(1.0f, 0.5f, 0.0f), 0.0f)};
+            Material(Color(1.0f, 0.5f, 0.0f), 0.0f), dummySphere};
 
         const Color resultingColor{
             light.illuminate(intersection, Scene(), observerLocation)};
@@ -72,7 +73,7 @@ TEST_CASE("PointLight") {
             Vector3(0.0f, 0.0f, -1.0f), 1.0f,
             // if energy was conserved, the reflectiveness should influence
             // the intensity of the specular highlights -> not the case ATM
-            Material(Color(1.0f, 0.5f, 0.0f), 1.0f, 60.0f)};
+            Material(Color(1.0f, 0.5f, 0.0f), 1.0f, 60.0f), dummySphere};
 
         const Color resultingColor{
             light.illuminate(intersection, Scene(), observerLocation)};

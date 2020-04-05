@@ -16,7 +16,7 @@ TEST_CASE("Renderer") {
     scene.addShape(rightPlane);
 
     LightRack lights;
-    const AmbientLight ambientLight{Color(0.5f)};
+    const AmbientLight ambientLight{Color(0.5f), false};
     lights.addLight(ambientLight);
 
     const Renderer renderer{scene, lights, 400, 300};

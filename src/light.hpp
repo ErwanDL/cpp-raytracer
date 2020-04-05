@@ -29,9 +29,10 @@ class LightRack : public Light {
 
 class AmbientLight : public Light {
     Color color;
+    bool useAmbientOcclusion;
 
    public:
-    AmbientLight(const Color& color);
+    AmbientLight(const Color& color, bool useAmbientOcclusion = true);
 
     Color illuminate(const Intersection& intersection,
                      const Intersectable& scene,

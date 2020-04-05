@@ -8,17 +8,8 @@
 
 #include "../src/utils.hpp"
 
-Color::Color(float f) {
-    const float clampedF = Math::unitClamp(f);
-    r = clampedF;
-    g = clampedF;
-    b = clampedF;
-}
-Color::Color(float red, float green, float blue) {
-    r = Math::unitClamp(red);
-    g = Math::unitClamp(green);
-    b = Math::unitClamp(blue);
-}
+Color::Color(float f) : r(f), g(f), b(f) {}
+Color::Color(float red, float green, float blue) : r(red), g(green), b(blue) {}
 
 Color Color::gammaCorrected(float exposure, float gamma) const {
     float red = Math::unitClamp(std::pow(r * exposure, gamma));
@@ -37,8 +28,7 @@ Color operator*(const Color &c, float f) {
     return Color(c.r * f, c.g * f, c.b * f);
 }
 Color operator+(const Color &c1, const Color &c2) {
-    return Color(Math::unitClamp(c1.r + c2.r), Math::unitClamp(c1.g + c2.g),
-                 Math::unitClamp(c1.b + c2.b));
+    return Color(c1.r + c2.r, c1.g + c2.g, c1.b + c2.b);
 }
 std::ostream &operator<<(std::ostream &out, const Color &color) {
     out << "Color(R: " << color.r << ", G: " << color.g << ", B: " << color.b
@@ -47,9 +37,9 @@ std::ostream &operator<<(std::ostream &out, const Color &color) {
 }
 
 Color &Color::operator+=(const Color &other) {
-    r = Math::unitClamp(r + other.r);
-    g += Math::unitClamp(other.g);
-    b += Math::unitClamp(other.b);
+    r += other.r;
+    g += other.g;
+    b += other.b;
     return *this;
 }
 

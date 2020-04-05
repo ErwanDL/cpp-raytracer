@@ -9,11 +9,25 @@
 // CLASS INTERSECTION
 
 Intersection::Intersection(Point3 location, const Vector3 &normal,
-                           float distanceToRayOrigin, const Material &material)
+                           float distanceToRayOrigin, const Material &material,
+                           const Shape &intersectedShape)
     : location(location),
       normal(normal.normalized()),
       distanceToRayOrigin(distanceToRayOrigin),
-      material(material) {}
+      material(material),
+      intersectedShape(&intersectedShape) {}
+
+Intersection &Intersection::operator=(const Intersection &other) {
+    if (&other == this) {
+        return *this;
+    }
+    location = other.location;
+    normal = other.normal;
+    distanceToRayOrigin = other.distanceToRayOrigin;
+    material = other.material;
+    intersectedShape = other.intersectedShape;
+    return *this;
+}
 
 // CLASS RAY
 

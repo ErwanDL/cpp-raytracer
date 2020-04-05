@@ -1,12 +1,12 @@
 #include "light.hpp"
 
 #include <cmath>
-#include <limits>
 #include <utility>
 #include <vector>
 
 #include "ray.hpp"
 #include "shape.hpp"
+#include "utils.hpp"
 #include "vectors.hpp"
 
 // CLASS LIGHTRACK
@@ -26,18 +26,20 @@ Color LightRack::illuminate(const Intersection& intersection,
 }
 
 // CLASS AMBIENTLIGHT
-AmbientLight::AmbientLight(const Color& color) : color(color) {}
+AmbientLight::AmbientLight(const Color& color, bool useAmbientOcclusion)
+    : color(color), useAmbientOcclusion(useAmbientOcclusion) {}
 
 Color AmbientLight::illuminate(const Intersection& intersection,
                                const Intersectable& scene,
                                const Point3&) const {
-    const auto closest = scene.closestPointTo(intersection.location);
-
     float occlusionCoeff = 1.0f;
-    if (intersection.normal.dot(closest.first - intersection.location) >
-        0.01f) {
-        occlusionCoeff = 1.0f;
-        // 0.05f * std::sqrt(closest.second / (1 + closest.second));
+    if (useAmbientOcclusion) {
+        const float distanceToClosestShape = scene.distanceTo(intersection);
+        if (distanceToClosestShape != Math::INF) {
+            occlusionCoeff =
+                0.5f + 0.5f * std::sqrt(distanceToClosestShape /
+                                        (1 + distanceToClosestShape));
+        }
     }
 
     return intersection.material.color * color * occlusionCoeff;

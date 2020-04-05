@@ -2,6 +2,7 @@
 #define UTILS_HPP
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <optional>
 #include <utility>
 
@@ -11,6 +12,7 @@ T sqr(T x) {
     return x * x;
 }
 constexpr float PI{3.141592f};
+constexpr float INF{std::numeric_limits<float>::infinity()};
 
 template <typename T>
 bool floatingPointEquality(T a, T b) {

@@ -9,7 +9,7 @@ struct Color final {
     float b;
 
    public:
-    explicit Color(float f);
+    Color(float f);
     Color(float red, float green, float blue);
 
     Color gammaCorrected(float exposure, float gamma) const;
