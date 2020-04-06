@@ -51,8 +51,13 @@ Color PointLight::illuminate(const Intersection& intersection,
     // in which case a shadow is cast
     Ray rayTowardsLight{intersection.location, -fromLight,
                         (origin - intersection.location).length()};
-    if (scene.intersect(rayTowardsLight)) {
-        return Color(0.0f);
+    const auto shadowIntersection = scene.intersect(rayTowardsLight);
+    float shadowCoeff = 1.0f;
+    if (shadowIntersection) {
+        const float borderCoeff = fromLight.dot(shadowIntersection->normal);
+        if (borderCoeff > 0.0f) {
+            shadowCoeff -= std::sqrt(borderCoeff);
+        }
     }
 
     const Vector3 towardsCam =
@@ -63,7 +68,7 @@ Color PointLight::illuminate(const Intersection& intersection,
     const Color diffuseColor = computeDiffuse(lightDotN, intersection.material);
     const Color specularColor =
         computeSpecular(observerDotReflected, intersection.material);
-    return diffuseColor + specularColor;
+    return shadowCoeff * (diffuseColor + specularColor);
 }
 
 Color PointLight::computeDiffuse(float lightDotN,
@@ -73,6 +78,6 @@ Color PointLight::computeDiffuse(float lightDotN,
 
 Color PointLight::computeSpecular(float observerDotReflected,
                                   const Material& material) const {
-    return std::pow(observerDotReflected, material.shininess) *
+    return std::pow(observerDotReflected, material.smoothness) *
            material.specular * this->color;
 }

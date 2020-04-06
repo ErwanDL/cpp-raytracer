@@ -7,7 +7,26 @@
 #include "../src/shape.hpp"
 #include "../src/vectors.hpp"
 
-TEST_CASE("AmbientLight") {}
+TEST_CASE("AmbientLight") {
+    SECTION(
+        "lights any intersection correctly and the same regardless of observer "
+        "location") {
+        const AmbientLight light{0.5f};
+        const Material material{Color(0.5f, 1.0f, 0.1f)};
+        const Intersection i1{Point3(0.0f, 1.0f, 2.0f),
+                              Vector3(1.0f, 1.0f, -1.0f), 1.0f, material};
+        const Intersection i2{Point3(-5.0f, 6.0f, -2.0f),
+                              Vector3(-1.0f, 3.0f, 0.0f), 5.0f, material};
+        const Sphere sphere{Point3(0.0f, 3.0f, -4.0f), 2.0f};
+        Scene scene;
+        scene.addShape(sphere);
+
+        REQUIRE(light.illuminate(i1, scene, Point3(-30.0f, 0.0f, 0.0f)) ==
+                Color(0.25f, 0.5f, 0.05f));
+        REQUIRE(light.illuminate(i2, scene, Point3(50.0f, -790.0f, 0.0f)) ==
+                Color(0.25f, 0.5f, 0.05f));
+    }
+}
 
 TEST_CASE("PointLight") {
     const PointLight light{Point3(0.0f, 5.0f, 0.0f), Color(0.5f)};

@@ -31,7 +31,7 @@ class AmbientLight : public Light {
     Color color;
 
    public:
-    AmbientLight(const Color& color);
+    explicit AmbientLight(const Color& color);
 
     Color illuminate(const Intersection& intersection, const Intersectable&,
                      const Point3&) const override;
