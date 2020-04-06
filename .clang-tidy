@@ -14,7 +14,8 @@ Checks: 'bugprone-*,
         -cppcoreguidelines-pro-type-vararg,
         -modernize-use-nodiscard,
         -google-runtime-references,
-        -google-explicit-constructor'
+        -google-explicit-constructor,
+        -readability-named-parameter'
 
 CheckOptions:
     - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic

@@ -43,7 +43,7 @@ class Plane : public Shape {
 
    public:
     Plane(const Point3 &position, const Vector3 &normal,
-          const Material &material = Material());
+          const Material &material = Lambertian(Color(0.4f, 0.4f, 0.7f)));
 
     std::optional<Intersection> intersect(const Ray &ray) const override;
 };
@@ -55,7 +55,7 @@ class Sphere : public Shape {
 
    public:
     Sphere(const Point3 &centre, float radius,
-           const Material &material = Material());
+           const Material &material = Lambertian(Color(0.4f, 0.7f, 0.4f)));
 
     std::optional<Intersection> intersect(const Ray &ray) const override;
 };

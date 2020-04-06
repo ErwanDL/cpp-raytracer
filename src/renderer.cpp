@@ -43,14 +43,13 @@ Color Renderer::shootRayRecursively(const Ray &ray, int nReflexionsLeft) const {
     const Color intersectionColor =
         lights.illuminate(intersection.value(), scene, ray.origin);
 
-    if (nReflexionsLeft == 0 ||
-        Math::floatingPointEquality(intersection->material.specular, 0.0f)) {
+    if (nReflexionsLeft == 0 || !intersection->material.isReflective()) {
         return intersectionColor;
     }
     const Ray reflectedRay{intersection->location,
                            ray.direction.reflected(intersection->normal)};
     const Color reflectedColor =
-        intersection->material.specular *
+        intersection->material.specularColor *
         shootRayRecursively(reflectedRay, nReflexionsLeft - 1);
     return intersectionColor + reflectedColor;
 }

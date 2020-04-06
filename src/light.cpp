@@ -29,7 +29,7 @@ AmbientLight::AmbientLight(const Color& color) : color(color) {}
 
 Color AmbientLight::illuminate(const Intersection& intersection,
                                const Intersectable&, const Point3&) const {
-    return intersection.material.color * color;
+    return intersection.material.diffuseColor * color;
 }
 
 // CLASS POINTLIGHT
@@ -73,11 +73,11 @@ Color PointLight::illuminate(const Intersection& intersection,
 
 Color PointLight::computeDiffuse(float lightDotN,
                                  const Material& material) const {
-    return lightDotN * this->color * material.color;
+    return lightDotN * this->color * material.diffuseColor;
 }
 
 Color PointLight::computeSpecular(float observerDotReflected,
                                   const Material& material) const {
     return std::pow(observerDotReflected, material.smoothness) *
-           material.specular * this->color;
+           material.specularColor * this->color;
 }

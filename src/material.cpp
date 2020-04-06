@@ -1,22 +1,16 @@
 #include "material.hpp"
 
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <iostream>
-#include <stdexcept>
 
-#include "../src/utils.hpp"
+#include "utils.hpp"
 
 Color::Color(float f) : r(f), g(f), b(f) {}
-Color::Color(float red, float green, float blue) {
-    r = red;
-    g = green;
-    b = blue;
-}
+Color::Color(float red, float green, float blue) : r(red), g(green), b(blue) {}
 
 Color Color::gammaCorrected(float exposure, float gamma) const {
-    float red = Math::unitClamp(::pow(r * exposure, gamma));
+    float red = Math::unitClamp(std::pow(r * exposure, gamma));
     float green = Math::unitClamp(std::pow(g * exposure, gamma));
     float blue = Math::unitClamp(std::pow(b * exposure, gamma));
     return Color(red, green, blue);
@@ -53,11 +47,21 @@ bool Color::operator==(const Color &other) const {
            Math::floatingPointEquality(b, other.b);
 }
 
-// STRUCT MATERIAL
+// MATERIALS
+Material::Material(const Color &diffuseColor, const Color &specularColor,
+                   float smoothness)
+    : diffuseColor(diffuseColor),
+      specularColor(specularColor),
+      smoothness(smoothness) {}
 
-Material::Material(const Color &color, float specular, float shininess,
-                   float diffuse)
-    : color(color),
-      diffuse(diffuse),
-      specular(specular),
-      shininess(shininess) {}
+bool Material::isReflective() const {
+    return specularColor.r > 0.0f || specularColor.g > 0.0f ||
+           specularColor.b > 0.0f;
+}
+
+Lambertian::Lambertian(const Color &diffuseColor, float specularity,
+                       float smoothness)
+    : Material(diffuseColor, Color(specularity), smoothness) {}
+
+Metal::Metal(const Color &specularColor, float smoothness)
+    : Material(Color(0.0f), specularColor, smoothness) {}

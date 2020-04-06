@@ -9,9 +9,9 @@
 TEST_CASE("Renderer") {
     Scene scene;
     const Plane leftPlane{Point3(-1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f),
-                          Material(Color(1.0f, 0.0f, 0.0f), 0.5f)};
+                          Lambertian(Color(1.0f, 0.0f, 0.0f), 0.5f)};
     const Plane rightPlane{Point3(1.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f),
-                           Material(Color(0.0f, 0.0f, 1.0f), 0.5f)};
+                           Lambertian(Color(0.0f, 0.0f, 1.0f), 0.5f)};
     scene.addShape(leftPlane);
     scene.addShape(rightPlane);
 
