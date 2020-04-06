@@ -13,7 +13,8 @@ Checks: 'bugprone-*,
         -modernize-use-trailing-return-type,
         -cppcoreguidelines-pro-type-vararg,
         -modernize-use-nodiscard,
-        -google-runtime-references'
+        -google-runtime-references,
+        -google-explicit-constructor'
 
 CheckOptions:
     - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
