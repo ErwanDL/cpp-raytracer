@@ -52,8 +52,8 @@ int main() {
     const PointLight light2{Point3(-3.0f, 5.5f, 0.0f), Color(0.5f)};
     lightRack.addLight(light2);
 
-    constexpr int width{1280};
-    constexpr int height{720};
+    constexpr int width{1920};
+    constexpr int height{1080};
 
     PerspectiveCamera camera{
         Point3(0.0f, 4.0f, 0.0f), Vector3(0.0f, 1.0f, -10.0f),
@@ -62,7 +62,7 @@ int main() {
 
     Renderer renderer{scene, lightRack, width, height};
 
-    auto render = renderer.rayTrace(camera, 4);
+    auto render = renderer.rayTrace(camera, 4, 3);
     renderer.saveRenderer(render, "scene.ppm");
 
     return 0;

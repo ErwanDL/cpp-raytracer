@@ -15,6 +15,7 @@ struct Color final {
     Color gammaCorrected(float exposure, float gamma) const;
 
     Color &operator+=(const Color &other);
+    Color &operator/=(float f);
     bool operator==(const Color &other) const;
 };
 

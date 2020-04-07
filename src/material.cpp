@@ -41,6 +41,13 @@ Color &Color::operator+=(const Color &other) {
     return *this;
 }
 
+Color &Color::operator/=(float f) {
+    r /= f;
+    g /= f;
+    b /= f;
+    return *this;
+}
+
 bool Color::operator==(const Color &other) const {
     return Math::floatingPointEquality(r, other.r) &&
            Math::floatingPointEquality(g, other.g) &&

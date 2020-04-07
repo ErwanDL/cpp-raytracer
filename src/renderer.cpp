@@ -1,6 +1,7 @@
 #include "renderer.hpp"
 
 #include <cmath>
+#include <exception>
 #include <fstream>
 #include <vector>
 
@@ -18,17 +19,28 @@ Renderer::Renderer(const Intersectable &scene, const Light &lights, int width,
       exposure(exposure),
       gamma(gamma) {}
 
-std::vector<int> Renderer::rayTrace(const Camera &camera, int nReflexions) {
+std::vector<int> Renderer::rayTrace(const Camera &camera, int nReflexions,
+                                    int supersamplingRate) const {
     std::vector<int> pixelValues(width * height * 3, 0);
 
     for (int x{0}; x < width; ++x) {
         for (int y{0}; y < height; ++y) {
-            const Vector2 screenCoord = screenCoordinateFromXY(x, y);
-            const Ray initialRay = camera.makeRay(screenCoord);
-            const Color pixelColor =
-                shootRayRecursively(initialRay, nReflexions);
+            const auto offsets = getSupersamplingOffsets(supersamplingRate);
+            Color averageColor{0.0f};
+            for (const float subX : offsets) {
+                for (const float subY : offsets) {
+                    const Vector2 screenCoord =
+                        screenCoordinateFromXY(static_cast<float>(x) + subX,
+                                               static_cast<float>(y) + subY);
+                    const Ray initialRay = camera.makeRay(screenCoord);
+                    averageColor +=
+                        shootRayRecursively(initialRay, nReflexions);
+                }
+            }
+            averageColor /=
+                static_cast<float>(supersamplingRate * supersamplingRate);
             setPixel(pixelValues, y, x,
-                     pixelColor.gammaCorrected(exposure, gamma));
+                     averageColor.gammaCorrected(exposure, gamma));
         }
     }
 
@@ -54,9 +66,21 @@ Color Renderer::shootRayRecursively(const Ray &ray, int nReflexionsLeft) const {
     return intersectionColor + reflectedColor;
 }
 
-Vector2 Renderer::screenCoordinateFromXY(int x, int y) const {
-    return {2.0f * static_cast<float>(x) / static_cast<float>(width) - 1.0f,
-            -2.0f * static_cast<float>(y) / static_cast<float>(height) + 1.0f};
+std::vector<float> Renderer::getSupersamplingOffsets(int supersamplingRate) {
+    if (supersamplingRate <= 0) {
+        throw std::domain_error("Supersampling rate muste be >= 1");
+    }
+    const float unitSpacing = 1.0f / static_cast<float>(supersamplingRate);
+    std::vector<float> offsets(supersamplingRate);
+    for (int i = 0; i < supersamplingRate; ++i) {
+        offsets[i] = unitSpacing + 2.0f * static_cast<float>(i) * unitSpacing;
+    }
+    return offsets;
+}
+
+Vector2 Renderer::screenCoordinateFromXY(float x, float y) const {
+    return {2.0f * x / static_cast<float>(width) - 1.0f,
+            -2.0f * y / static_cast<float>(height) + 1.0f};
 }
 
 void Renderer::saveRenderer(const std::vector<int> &pixelValues,
@@ -74,7 +98,7 @@ void Renderer::saveRenderer(const std::vector<int> &pixelValues,
 }
 
 void Renderer::setPixel(std::vector<int> &pixelValues, int row, int col,
-                        const Color &color) {
+                        const Color &color) const {
     int redIndex{width * row * 3 + col * 3};
     pixelValues.at(redIndex) = convertTo8BitValue(color.r);
     pixelValues.at(redIndex + 1) = convertTo8BitValue(color.g);

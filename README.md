@@ -37,11 +37,13 @@ If you want to change the rendered scene, you can do so in `src/main.cpp`.
 -   [x] Cast shadows
 -   [x] Specular highlights (Phong illumination model)
 -   [x] Perfect reflections
+-   [x] Anti-aliasing (via deterministic supersampling)
+-   [ ] Anti-aliasing (via stochastic supersampling)
 -   [ ] Glossy reflections
 -   [ ] Texture mapping
 -   [ ] Area lights
--   [ ] Anti-aliasing
 -   [ ] Ambient occlusion
+-   [ ] Adaptive supersampling
 -   [ ] Glass material
 -   [ ] Multi-threaded implementation
 -   [ ] Environment mapping
