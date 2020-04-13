@@ -37,8 +37,7 @@ T unitClamp(T x) {
  * Returns false if the equation has no solution, returns a pair (t1, t2) with
  * t1 <= t2 else.
  */
-inline std::optional<std::pair<float, float>>
-solveSecondDegreeEquation(  // NOLINT(misc-definitions-in-headers)
+inline std::optional<std::pair<float, float>> solveSecondDegreeEquation(
     float a, float b, float c) {
     float discriminant{Math::sqr(b) - 4 * a * c};
 

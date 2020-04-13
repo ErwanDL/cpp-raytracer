@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include <string>
 
@@ -52,17 +53,23 @@ int main() {
     const PointLight light2{Point3(-3.0f, 5.5f, 0.0f), Color(0.5f)};
     lightRack.addLight(light2);
 
-    constexpr int width{1920};
-    constexpr int height{1080};
+    constexpr int width{720};
+    constexpr int height{480};
 
     PerspectiveCamera camera{
         Point3(0.0f, 4.0f, 0.0f), Vector3(0.0f, 1.0f, -10.0f),
         Vector3(0.0f, 1.0f, 0.0f), Math::PI / 6,
         static_cast<float>(width) / static_cast<float>(height)};
 
-    Renderer renderer{scene, lightRack, width, height};
+    Renderer renderer{scene, lightRack, width, height,
+                      StochasticSupersampler(9)};
 
-    auto render = renderer.rayTrace(camera, 4, 3);
+    const auto start = std::chrono::steady_clock::now();
+    auto render = renderer.rayTrace(camera, 3);
+    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - start);
+    std::cout << "Raytracing duration : " << duration.count()
+              << " milliseconds.\n";
     renderer.saveRenderer(render, "scene.ppm");
 
     return 0;

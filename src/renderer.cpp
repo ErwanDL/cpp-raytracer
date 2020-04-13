@@ -3,6 +3,8 @@
 #include <cmath>
 #include <exception>
 #include <fstream>
+#include <random>
+#include <utility>
 #include <vector>
 
 #include "light.hpp"
@@ -11,34 +13,32 @@
 #include "vectors.hpp"
 
 Renderer::Renderer(const Intersectable &scene, const Light &lights, int width,
-                   int height, float exposure, float gamma)
+                   int height, const SupersamplingStrategy &superSampler,
+                   float exposure, float gamma)
     : scene(scene),
       lights(lights),
       width(width),
       height(height),
+      superSampler(superSampler),
       exposure(exposure),
       gamma(gamma) {}
 
-std::vector<int> Renderer::rayTrace(const Camera &camera, int nReflexions,
-                                    int supersamplingRate) const {
+std::vector<int> Renderer::rayTrace(const Camera &camera,
+                                    int nReflexions) const {
     std::vector<int> pixelValues(width * height * 3, 0);
 
     for (int x{0}; x < width; ++x) {
         for (int y{0}; y < height; ++y) {
-            const auto offsets = getSupersamplingOffsets(supersamplingRate);
+            const auto offsets = superSampler.getSupersamplingOffsets();
             Color averageColor{0.0f};
-            for (const float subX : offsets) {
-                for (const float subY : offsets) {
-                    const Vector2 screenCoord =
-                        screenCoordinateFromXY(static_cast<float>(x) + subX,
-                                               static_cast<float>(y) + subY);
-                    const Ray initialRay = camera.makeRay(screenCoord);
-                    averageColor +=
-                        shootRayRecursively(initialRay, nReflexions);
-                }
+            for (const auto offset : offsets) {
+                const Vector2 screenCoord = screenCoordinateFromXY(
+                    static_cast<float>(x) + offset.first,
+                    static_cast<float>(y) + offset.second);
+                const Ray initialRay = camera.makeRay(screenCoord);
+                averageColor += shootRayRecursively(initialRay, nReflexions);
             }
-            averageColor /=
-                static_cast<float>(supersamplingRate * supersamplingRate);
+            averageColor /= static_cast<float>(offsets.size());
             setPixel(pixelValues, y, x,
                      averageColor.gammaCorrected(exposure, gamma));
         }
@@ -64,18 +64,6 @@ Color Renderer::shootRayRecursively(const Ray &ray, int nReflexionsLeft) const {
         intersection->material.specularColor *
         shootRayRecursively(reflectedRay, nReflexionsLeft - 1);
     return intersectionColor + reflectedColor;
-}
-
-std::vector<float> Renderer::getSupersamplingOffsets(int supersamplingRate) {
-    if (supersamplingRate <= 0) {
-        throw std::domain_error("Supersampling rate muste be >= 1");
-    }
-    const float unitSpacing = 1.0f / static_cast<float>(supersamplingRate);
-    std::vector<float> offsets(supersamplingRate);
-    for (int i = 0; i < supersamplingRate; ++i) {
-        offsets[i] = unitSpacing + 2.0f * static_cast<float>(i) * unitSpacing;
-    }
-    return offsets;
 }
 
 Vector2 Renderer::screenCoordinateFromXY(float x, float y) const {
@@ -107,4 +95,48 @@ void Renderer::setPixel(std::vector<int> &pixelValues, int row, int col,
 
 int Renderer::convertTo8BitValue(float f) {
     return static_cast<int>(std::round(f * 255));
+}
+
+// CLASS DETERMINISTICSUPERSAMPLER
+
+DeterministicSupersampler::DeterministicSupersampler(int rate) : rate(rate) {
+    if (rate <= 0) {
+        throw std::domain_error("Supersampling rate muste be >= 1");
+    }
+}
+std::vector<std::pair<float, float>>
+DeterministicSupersampler::getSupersamplingOffsets() const {
+    const float unitSpacing = 0.5f / static_cast<float>(rate);
+    std::vector<float> floatOffsets(rate);
+    for (int i = 0; i < rate; ++i) {
+        floatOffsets[i] =
+            -0.5f + unitSpacing + 2.0f * static_cast<float>(i) * unitSpacing;
+    }
+    std::vector<std::pair<float, float>> vectorOffsets(rate * rate);
+    int cursor = 0;
+    for (const float u : floatOffsets) {
+        for (const float v : floatOffsets) {
+            vectorOffsets[cursor] = {u, v};
+            ++cursor;
+        }
+    }
+    return vectorOffsets;
+}
+
+// CLASS STOCHASTICSUPERSAMPLER
+
+StochasticSupersampler::StochasticSupersampler(int samplesPerPixel)
+    : samplesPerPixel(samplesPerPixel), generator(std::random_device{}()) {
+    if (samplesPerPixel <= 0) {
+        throw std::domain_error("Number of samples per pixel muste be >= 1");
+    }
+}
+
+std::vector<std::pair<float, float>>
+StochasticSupersampler::getSupersamplingOffsets() const {
+    std::vector<std::pair<float, float>> vectorOffsets(samplesPerPixel);
+    for (int i = 0; i < samplesPerPixel; ++i) {
+        vectorOffsets[i] = {distribution(generator), distribution(generator)};
+    }
+    return vectorOffsets;
 }
