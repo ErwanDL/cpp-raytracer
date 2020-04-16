@@ -1,9 +1,11 @@
 #include "renderer.hpp"
 
 #include <cmath>
+#include <cstdlib>
 #include <exception>
 #include <fstream>
 #include <random>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -26,8 +28,11 @@ Renderer::Renderer(const Intersectable &scene, const Light &lights, int width,
 std::vector<int> Renderer::rayTrace(const Camera &camera,
                                     int nReflexions) const {
     std::vector<int> pixelValues(width * height * 3, 0);
-
+    const auto start = std::chrono::steady_clock::now();
+    std::cout << "Starting to render the scene...\n";
+    std::system("stty -echo");
     for (int x{0}; x < width; ++x) {
+        displayProgress(static_cast<float>(x) / static_cast<float>(width));
         for (int y{0}; y < height; ++y) {
             const auto offsets = superSampler.getSupersamplingOffsets();
             Color averageColor{0.0f};
@@ -44,7 +49,27 @@ std::vector<int> Renderer::rayTrace(const Camera &camera,
         }
     }
 
+    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - start);
+    std::cout << "\nRaytracing duration : " << duration.count()
+              << " milliseconds.\n";
+    std::system("stty echo");
+
     return pixelValues;
+}
+
+void Renderer::displayProgress(float progressRatio) {
+    constexpr int nChars = 50;
+    const int nSquares = static_cast<int>(std::round(progressRatio * nChars));
+    std::string progressBar;
+    for (int i = 0; i < nSquares; ++i) {
+        progressBar.append("■");
+    }
+    for (int i = nSquares; i < nChars; ++i) {
+        progressBar.append("-");
+    }
+    std::cout << '\r' << progressBar << ' '
+              << static_cast<int>(100 * progressRatio) << '%' << std::flush;
 }
 
 Color Renderer::shootRayRecursively(const Ray &ray, int nReflexionsLeft) const {

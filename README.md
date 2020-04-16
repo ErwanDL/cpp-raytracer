@@ -39,8 +39,10 @@ If you want to change the rendered scene, you can do so in `src/main.cpp`.
 -   [x] Perfect reflections
 -   [x] Anti-aliasing (via deterministic supersampling)
 -   [x] Anti-aliasing (via stochastic supersampling)
+-   [x] Progress bar
 -   [ ] Glossy reflections
 -   [ ] Texture mapping
+-   [ ] Normal mapping
 -   [ ] Area lights
 -   [ ] Ambient occlusion
 -   [ ] Adaptive supersampling

@@ -64,12 +64,7 @@ int main() {
     Renderer renderer{scene, lightRack, width, height,
                       StochasticSupersampler(9)};
 
-    const auto start = std::chrono::steady_clock::now();
-    auto render = renderer.rayTrace(camera, 3);
-    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - start);
-    std::cout << "Raytracing duration : " << duration.count()
-              << " milliseconds.\n";
+    auto render = renderer.rayTrace(camera, 2);
     renderer.saveRenderer(render, "scene.ppm");
 
     return 0;

@@ -39,6 +39,7 @@ class Renderer {
     Vector2 screenCoordinateFromXY(float x, float y) const;
     void setPixel(std::vector<int> &pixelValues, int row, int col,
                   const Color &color) const;
+    static void displayProgress(float progressRatio);
     static int convertTo8BitValue(float f);
 };
 
