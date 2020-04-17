@@ -62,9 +62,9 @@ int main() {
         static_cast<float>(width) / static_cast<float>(height)};
 
     Renderer renderer{scene, lightRack, width, height,
-                      StochasticSupersampler(9)};
+                      DeterministicSupersampler(1)};
 
-    auto render = renderer.rayTrace(camera, 2);
+    auto render = renderer.rayTrace(camera, 4);
     renderer.saveRenderer(render, "scene.ppm");
 
     return 0;

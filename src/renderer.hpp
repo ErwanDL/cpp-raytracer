@@ -1,13 +1,13 @@
 #ifndef IMAGE_HPP
 #define IMAGE_HPP
 
-#include <random>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "camera.hpp"
 #include "light.hpp"
+#include "random.hpp"
 #include "shape.hpp"
 
 struct Color;
@@ -60,8 +60,7 @@ class DeterministicSupersampler : public SupersamplingStrategy {
 
 class StochasticSupersampler : public SupersamplingStrategy {
     int samplesPerPixel;
-    mutable std::mt19937 generator;
-    mutable std::uniform_real_distribution<float> distribution{-0.5, 0.5f};
+    UniformIntervalRNG generator{-0.5f, 0.5f};
 
    public:
     explicit StochasticSupersampler(int samplesPerPixel);

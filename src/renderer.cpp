@@ -1,10 +1,8 @@
 #include "renderer.hpp"
 
 #include <cmath>
-#include <cstdlib>
 #include <exception>
 #include <fstream>
-#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -29,8 +27,8 @@ std::vector<int> Renderer::rayTrace(const Camera &camera,
                                     int nReflexions) const {
     std::vector<int> pixelValues(width * height * 3, 0);
     const auto start = std::chrono::steady_clock::now();
-    std::cout << "Starting to render the scene...\n";
-    std::system("stty -echo");
+    std::cout << "Starting render...\n";
+
     for (int x{0}; x < width; ++x) {
         displayProgress(static_cast<float>(x) / static_cast<float>(width));
         for (int y{0}; y < height; ++y) {
@@ -51,9 +49,9 @@ std::vector<int> Renderer::rayTrace(const Camera &camera,
 
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now() - start);
-    std::cout << "\nRaytracing duration : " << duration.count()
-              << " milliseconds.\n";
-    std::system("stty echo");
+    std::cout << "\nScene rendered in "
+              << static_cast<float>(duration.count()) / 1000.0f
+              << " seconds.\n";
 
     return pixelValues;
 }
@@ -69,7 +67,8 @@ void Renderer::displayProgress(float progressRatio) {
         progressBar.append("-");
     }
     std::cout << '\r' << progressBar << ' '
-              << static_cast<int>(100 * progressRatio) << '%' << std::flush;
+              << static_cast<int>(std::round(100 * progressRatio)) << '%'
+              << std::flush;
 }
 
 Color Renderer::shootRayRecursively(const Ray &ray, int nReflexionsLeft) const {
@@ -129,6 +128,7 @@ DeterministicSupersampler::DeterministicSupersampler(int rate) : rate(rate) {
         throw std::domain_error("Supersampling rate muste be >= 1");
     }
 }
+
 std::vector<std::pair<float, float>>
 DeterministicSupersampler::getSupersamplingOffsets() const {
     const float unitSpacing = 0.5f / static_cast<float>(rate);
@@ -151,7 +151,7 @@ DeterministicSupersampler::getSupersamplingOffsets() const {
 // CLASS STOCHASTICSUPERSAMPLER
 
 StochasticSupersampler::StochasticSupersampler(int samplesPerPixel)
-    : samplesPerPixel(samplesPerPixel), generator(std::random_device{}()) {
+    : samplesPerPixel(samplesPerPixel) {
     if (samplesPerPixel <= 0) {
         throw std::domain_error("Number of samples per pixel muste be >= 1");
     }
@@ -161,7 +161,7 @@ std::vector<std::pair<float, float>>
 StochasticSupersampler::getSupersamplingOffsets() const {
     std::vector<std::pair<float, float>> vectorOffsets(samplesPerPixel);
     for (int i = 0; i < samplesPerPixel; ++i) {
-        vectorOffsets[i] = {distribution(generator), distribution(generator)};
+        vectorOffsets[i] = {generator.generate(), generator.generate()};
     }
     return vectorOffsets;
 }
