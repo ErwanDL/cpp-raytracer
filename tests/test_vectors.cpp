@@ -1,6 +1,7 @@
 #include <catch2/catch.hpp>
 #include <cmath>
 
+#include "../src/utils.hpp"
 #include "../src/vectors.hpp"
 
 TEST_CASE("Vector2") {
@@ -92,5 +93,22 @@ TEST_CASE("Vector3") {
         const auto reflected = v.reflected(normal);
 
         REQUIRE(reflected == Vector3(1.0f, 1.0f, 1.0f));
+    }
+
+    SECTION("sphericallyRotated returns correct results") {
+        const Vector3 v1{1.0f, 1.0f, std::sqrt(2.0f)};
+
+        const Vector3 rotated1 = Vector3::sphericallyRotated(
+            v1.normalized(), -Math::PI / 4.0f, Math::PI / 4.0f);
+
+        REQUIRE(rotated1 == Vector3(1.0f, 0.0f, 0.0f).normalized());
+
+        const Vector3 v3{-1.0f, 0.0f, 0.0f};
+
+        const Vector3 rotated2 = Vector3::sphericallyRotated(
+            v3.normalized(), Math::PI / 2.0f, Math::PI / 6.0f);
+
+        REQUIRE(rotated2 ==
+                Vector3(0.0f, -std::sqrt(3.0f) / 2.0f, -0.5f).normalized());
     }
 }

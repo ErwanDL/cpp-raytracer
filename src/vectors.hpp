@@ -18,6 +18,8 @@ class Vector3 {
     float dot(const Vector3 &other) const;
     Vector3 cross(const Vector3 &other) const;
     Vector3 reflected(const Vector3 &normal) const;
+    static Vector3 sphericallyRotated(const Vector3 &normalizedDirection,
+                                      float theta, float phi);
 
     Vector3 &operator+=(const Vector3 &other);
     Vector3 &operator-=(const Vector3 &other);

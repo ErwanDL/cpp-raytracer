@@ -34,6 +34,7 @@ Vector3 &Vector3::operator/=(float f) {
     z /= f;
     return *this;
 }
+
 Vector3 Vector3::operator-() const { return Vector3(-x, -y, -z); }
 
 bool Vector3::operator==(const Vector3 &other) const {
@@ -95,6 +96,17 @@ Vector3 Vector3::cross(const Vector3 &other) const {
 Vector3 Vector3::reflected(const Vector3 &normal) const {
     const auto normalizedNormal = normal.normalized();
     return *this - 2 * dot(normalizedNormal) * normalizedNormal;
+}
+
+Vector3 Vector3::sphericallyRotated(const Vector3 &normalizedDirection,
+                                    float theta, float phi) {
+    float originalTheta =
+        std::atan2(normalizedDirection.getY(), normalizedDirection.getX());
+    float originalPhi = std::acos(normalizedDirection.getZ());
+    float newX = std::sin(originalPhi + phi) * std::cos(originalTheta + theta);
+    float newY = std::sin(originalPhi + phi) * std::sin(originalTheta + theta);
+    float newZ = std::cos(originalPhi + phi);
+    return {newX, newY, newZ};
 }
 
 float Vector3::getX() const { return x; }
