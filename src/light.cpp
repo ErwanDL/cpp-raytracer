@@ -52,23 +52,23 @@ Color PointLight::illuminate(const Intersection& intersection,
     Ray rayTowardsLight{intersection.location, -fromLight,
                         (origin - intersection.location).length()};
     const auto shadowIntersection = scene.intersect(rayTowardsLight);
-    float shadowCoeff = 1.0f;
+
     if (shadowIntersection) {
-        const float borderCoeff = fromLight.dot(shadowIntersection->normal);
-        if (borderCoeff > 0.0f) {
-            shadowCoeff -= std::sqrt(borderCoeff);
-        }
+        return Color(0.0f);
     }
 
-    const Vector3 towardsCam =
+    const Vector3 towardsObserver =
         (observerLocation - intersection.location).normalized();
     const float observerDotReflected =
-        towardsCam.dot(fromLight.reflected(intersection.normal));
+        towardsObserver.dot(fromLight.reflected(intersection.normal));
 
     const Color diffuseColor = computeDiffuse(lightDotN, intersection.material);
     const Color specularColor =
-        computeSpecular(observerDotReflected, intersection.material);
-    return shadowCoeff * (diffuseColor + specularColor);
+        observerDotReflected < 0.0f
+            ? Color(0.0f)
+            : computeSpecular(observerDotReflected, intersection.material);
+
+    return diffuseColor + specularColor;
 }
 
 Color PointLight::computeDiffuse(float lightDotN,
