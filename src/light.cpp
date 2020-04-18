@@ -80,5 +80,5 @@ Color PointLight::computeSpecular(float observerDotReflected,
                                   const Material& material) const {
     return std::pow(observerDotReflected, material.smoothness) *
            material.specularColor * this->color *
-           (material.smoothness / (1 + material.smoothness));
+           std::pow((material.smoothness - 1) / material.smoothness, 0.8f);
 }

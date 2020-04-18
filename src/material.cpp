@@ -69,9 +69,8 @@ Material::Material(const Color &diffuseColor, const Color &specularColor,
     }
 }
 
-bool Material::isReflective() const {
-    return specularColor.r > 0.0f || specularColor.g > 0.0f ||
-           specularColor.b > 0.0f;
+float Material::specularity() const {
+    return (specularColor.r + specularColor.g + specularColor.b) / 3.0f;
 }
 
 Lambertian::Lambertian(const Color &diffuseColor, float specularity,

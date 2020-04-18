@@ -31,7 +31,7 @@ struct Material {
     Color specularColor;
     float smoothness;
 
-    bool isReflective() const;
+    float specularity() const;
 
    protected:
     Material(const Color &diffuseColor, const Color &specularColor,

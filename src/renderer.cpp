@@ -13,18 +13,19 @@
 #include "vectors.hpp"
 
 Renderer::Renderer(const Intersectable &scene, const Light &lights, int width,
-                   int height, const SupersamplingStrategy &superSampler,
-                   float exposure, float gamma)
+                   int height, int maxGlossySamples,
+                   const SupersamplingStrategy &superSampler, float exposure,
+                   float gamma)
     : scene(scene),
       lights(lights),
       width(width),
       height(height),
+      maxGlossySamples(maxGlossySamples),
       superSampler(superSampler),
       exposure(exposure),
       gamma(gamma) {}
 
-std::vector<int> Renderer::rayTrace(const Camera &camera,
-                                    int nReflexions) const {
+std::vector<int> Renderer::rayTrace(const Camera &camera, int nBounces) const {
     std::vector<int> pixelValues(width * height * 3, 0);
     const auto start = std::chrono::steady_clock::now();
     std::cout << "Starting render...\n";
@@ -39,7 +40,7 @@ std::vector<int> Renderer::rayTrace(const Camera &camera,
                     static_cast<float>(x) + offset.first,
                     static_cast<float>(y) + offset.second);
                 const Ray initialRay = camera.makeRay(screenCoord);
-                averageColor += shootRayRecursively(initialRay, nReflexions);
+                averageColor += shootRayRecursively(initialRay, nBounces);
             }
             averageColor /= static_cast<float>(offsets.size());
             setPixel(pixelValues, y, x,
@@ -71,7 +72,7 @@ void Renderer::displayProgress(float progressRatio) {
               << std::flush;
 }
 
-Color Renderer::shootRayRecursively(const Ray &ray, int nReflexionsLeft) const {
+Color Renderer::shootRayRecursively(const Ray &ray, int nBouncesLeft) const {
     const auto intersection = scene.intersect(ray);
     if (!intersection) {
         return skyColor;
@@ -79,12 +80,20 @@ Color Renderer::shootRayRecursively(const Ray &ray, int nReflexionsLeft) const {
     const Color intersectionColor =
         lights.illuminate(intersection.value(), scene, ray.origin);
 
-    if (nReflexionsLeft == 0 || !intersection->material.isReflective()) {
+    if (nBouncesLeft == 0 || intersection->material.specularity() < 0.01f) {
         return intersectionColor;
     }
-    const auto reflections =
-        getRandomReflections(ray.direction.reflected(intersection->normal),
-                             intersection->material.smoothness);
+
+    const Vector3 perfectReflectionDirection =
+        ray.direction.reflected(intersection->normal);
+    const int nRandomReflections = static_cast<int>(
+        maxGlossySamples * intersection->material.specularity() /
+        (intersection->material.smoothness));
+    auto reflections = intersection->material.smoothness < 20.0f
+                           ? getRandomReflections(
+                                 nRandomReflections, perfectReflectionDirection,
+                                 intersection->material.smoothness)
+                           : std::vector<Vector3>{perfectReflectionDirection};
 
     Color reflectedColor{0.0f};
     int shotRays = 0;
@@ -92,7 +101,7 @@ Color Renderer::shootRayRecursively(const Ray &ray, int nReflexionsLeft) const {
         if (reflection.dot(intersection->normal) > 0.0f) {
             const Ray reflectedRay{intersection->location, reflection};
             reflectedColor +=
-                shootRayRecursively(reflectedRay, nReflexionsLeft - 1);
+                shootRayRecursively(reflectedRay, nBouncesLeft - 1);
             shotRays += 1;
         }
     }
@@ -102,9 +111,9 @@ Color Renderer::shootRayRecursively(const Ray &ray, int nReflexionsLeft) const {
                (reflectedColor / static_cast<float>(shotRays));
 }
 
-std::vector<Vector3> Renderer::getRandomReflections(const Vector3 mainDirection,
+std::vector<Vector3> Renderer::getRandomReflections(int nReflections,
+                                                    const Vector3 mainDirection,
                                                     float smoothness) const {
-    constexpr int nReflections = 100;
     std::vector<Vector3> reflections;
     for (int i = 0; i < nReflections; ++i) {
         const float theta = toAngle(generator.generate(), smoothness);

@@ -19,6 +19,7 @@ class Renderer {
     const Light &lights;
     int width;
     int height;
+    int maxGlossySamples;
     const SupersamplingStrategy &superSampler;
     float exposure;
     float gamma;
@@ -26,15 +27,16 @@ class Renderer {
 
    public:
     Renderer(const Intersectable &scene, const Light &lights, int width,
-             int height, const SupersamplingStrategy &superSampler,
-             float exposure = 1.0f, float gamma = 2.2f);
+             int height, int maxGlossySamples,
+             const SupersamplingStrategy &superSampler, float exposure = 1.0f,
+             float gamma = 2.2f);
 
-    std::vector<int> rayTrace(const Camera &camera, int nReflexions) const;
+    std::vector<int> rayTrace(const Camera &camera, int nBounces) const;
 
     void saveRender(const std::vector<int> &pixelValues,
                     const std::string &filename) const;
 
-    Color shootRayRecursively(const Ray &ray, int nReflexionsLeft) const;
+    Color shootRayRecursively(const Ray &ray, int nBouncesLeft) const;
 
    private:
     Vector2 screenCoordinateFromXY(float x, float y) const;
@@ -42,7 +44,8 @@ class Renderer {
                   const Color &color) const;
     static void displayProgress(float progressRatio);
     static int convertTo8BitValue(float f);
-    std::vector<Vector3> getRandomReflections(const Vector3 mainDirection,
+    std::vector<Vector3> getRandomReflections(int nReflections,
+                                              const Vector3 mainDirection,
                                               float smoothness) const;
     static float toAngle(float f, float exponent);
 };
