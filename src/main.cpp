@@ -7,6 +7,7 @@
 #include "material.hpp"
 #include "renderer.hpp"
 #include "shape.hpp"
+#include "supersampling.hpp"
 #include "utils.hpp"
 #include "vectors.hpp"
 
@@ -64,8 +65,12 @@ int main() {
         Vector3(0.0f, 1.0f, 0.0f), Math::PI / 6,
         static_cast<float>(width) / static_cast<float>(height)};
 
-    Renderer renderer{scene,  lightRack, width,
-                      height, 500,       DeterministicSupersampler(2)};
+    Renderer renderer{scene,
+                      lightRack,
+                      width,
+                      height,
+                      ReflectionGenerator(200),
+                      DeterministicSupersampler(1)};
 
     auto render = renderer.rayTrace(camera, 2);
     renderer.saveRender(render, "scene.ppm");

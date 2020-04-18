@@ -1,26 +1,26 @@
 #include "renderer.hpp"
 
 #include <cmath>
-#include <exception>
 #include <fstream>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "light.hpp"
+#include "random.hpp"
 #include "shape.hpp"
 #include "utils.hpp"
 #include "vectors.hpp"
 
 Renderer::Renderer(const Intersectable &scene, const Light &lights, int width,
-                   int height, int maxGlossySamples,
+                   int height, const ReflectionGenerator &reflectionGenerator,
                    const SupersamplingStrategy &superSampler, float exposure,
                    float gamma)
     : scene(scene),
       lights(lights),
       width(width),
       height(height),
-      maxGlossySamples(maxGlossySamples),
+      reflectionGenerator(reflectionGenerator),
       superSampler(superSampler),
       exposure(exposure),
       gamma(gamma) {}
@@ -86,14 +86,9 @@ Color Renderer::shootRayRecursively(const Ray &ray, int nBouncesLeft) const {
 
     const Vector3 perfectReflectionDirection =
         ray.direction.reflected(intersection->normal);
-    const int nRandomReflections = static_cast<int>(
-        maxGlossySamples * intersection->material.specularity() /
-        (intersection->material.smoothness));
-    auto reflections = intersection->material.smoothness < 20.0f
-                           ? getRandomReflections(
-                                 nRandomReflections, perfectReflectionDirection,
-                                 intersection->material.smoothness)
-                           : std::vector<Vector3>{perfectReflectionDirection};
+
+    auto reflections = reflectionGenerator.getRandomReflections(
+        perfectReflectionDirection, intersection->material);
 
     Color reflectedColor{0.0f};
     int shotRays = 0;
@@ -109,24 +104,6 @@ Color Renderer::shootRayRecursively(const Ray &ray, int nBouncesLeft) const {
     return intersectionColor +
            intersection->material.specularColor *
                (reflectedColor / static_cast<float>(shotRays));
-}
-
-std::vector<Vector3> Renderer::getRandomReflections(int nReflections,
-                                                    const Vector3 mainDirection,
-                                                    float smoothness) const {
-    std::vector<Vector3> reflections;
-    for (int i = 0; i < nReflections; ++i) {
-        const float theta = toAngle(generator.generate(), smoothness);
-        const float phi = toAngle(generator.generate(), smoothness);
-        reflections.push_back(
-            Vector3::sphericallyRotated(mainDirection, theta, phi));
-    }
-    return reflections;
-}
-
-float Renderer::toAngle(float f, float exponent) {
-    return Math::signBitToNumber(std::signbit(f)) *
-           std::asin(std::pow(std::abs(f), exponent));
 }
 
 Vector2 Renderer::screenCoordinateFromXY(float x, float y) const {
@@ -158,49 +135,4 @@ void Renderer::setPixel(std::vector<int> &pixelValues, int row, int col,
 
 int Renderer::convertTo8BitValue(float f) {
     return static_cast<int>(std::round(f * 255));
-}
-
-// CLASS DETERMINISTICSUPERSAMPLER
-
-DeterministicSupersampler::DeterministicSupersampler(int rate) : rate(rate) {
-    if (rate <= 0) {
-        throw std::domain_error("Supersampling rate muste be >= 1");
-    }
-}
-
-std::vector<std::pair<float, float>>
-DeterministicSupersampler::getSupersamplingOffsets() const {
-    const float unitSpacing = 0.5f / static_cast<float>(rate);
-    std::vector<float> floatOffsets(rate);
-    for (int i = 0; i < rate; ++i) {
-        floatOffsets[i] =
-            -0.5f + unitSpacing + 2.0f * static_cast<float>(i) * unitSpacing;
-    }
-    std::vector<std::pair<float, float>> vectorOffsets(rate * rate);
-    int cursor = 0;
-    for (const float u : floatOffsets) {
-        for (const float v : floatOffsets) {
-            vectorOffsets[cursor] = {u, v};
-            ++cursor;
-        }
-    }
-    return vectorOffsets;
-}
-
-// CLASS STOCHASTICSUPERSAMPLER
-
-StochasticSupersampler::StochasticSupersampler(int samplesPerPixel)
-    : samplesPerPixel(samplesPerPixel) {
-    if (samplesPerPixel <= 0) {
-        throw std::domain_error("Number of samples per pixel muste be >= 1");
-    }
-}
-
-std::vector<std::pair<float, float>>
-StochasticSupersampler::getSupersamplingOffsets() const {
-    std::vector<std::pair<float, float>> vectorOffsets(samplesPerPixel);
-    for (int i = 0; i < samplesPerPixel; ++i) {
-        vectorOffsets[i] = {generator.generate(), generator.generate()};
-    }
-    return vectorOffsets;
 }
