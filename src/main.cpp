@@ -69,8 +69,8 @@ int main() {
                       lightRack,
                       width,
                       height,
-                      ReflectionGenerator(200),
-                      DeterministicSupersampler(1)};
+                      ReflectionGenerator(500),
+                      DeterministicSupersampler(3)};
 
     auto render = renderer.rayTrace(camera, 2);
     renderer.saveRender(render, "scene.ppm");
