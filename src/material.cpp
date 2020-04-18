@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <exception>
 #include <iostream>
 
 #include "utils.hpp"
@@ -27,6 +28,9 @@ Color operator*(const Color &c, float f) {
 }
 Color operator+(const Color &c1, const Color &c2) {
     return Color(c1.r + c2.r, c1.g + c2.g, c1.b + c2.b);
+}
+Color operator/(const Color &c, float f) {
+    return Color(c.r / f, c.g / f, c.b / f);
 }
 std::ostream &operator<<(std::ostream &out, const Color &color) {
     out << "Color(R: " << color.r << ", G: " << color.g << ", B: " << color.b
@@ -59,7 +63,11 @@ Material::Material(const Color &diffuseColor, const Color &specularColor,
                    float smoothness)
     : diffuseColor(diffuseColor),
       specularColor(specularColor),
-      smoothness(smoothness) {}
+      smoothness(smoothness) {
+    if (smoothness < 1.0f) {
+        throw std::domain_error{"Smoothness of a material cannot be < 1.0f."};
+    }
+}
 
 bool Material::isReflective() const {
     return specularColor.r > 0.0f || specularColor.g > 0.0f ||

@@ -56,9 +56,9 @@ TEST_CASE("Stochastic Supersampler") {
 TEST_CASE("Renderer") {
     Scene scene;
     const Plane leftPlane{Point3(-1.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f),
-                          Lambertian(Color(1.0f, 0.0f, 0.0f), 0.5f)};
+                          Lambertian(Color(1.0f, 0.0f, 0.0f), 0.5f, 10000.0f)};
     const Plane rightPlane{Point3(1.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f),
-                           Lambertian(Color(0.0f, 0.0f, 1.0f), 0.5f)};
+                           Lambertian(Color(0.0f, 0.0f, 1.0f), 0.5f, 10000.0f)};
     scene.addShape(leftPlane);
     scene.addShape(rightPlane);
 

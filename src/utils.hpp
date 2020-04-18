@@ -12,6 +12,8 @@ T sqr(T x) {
 }
 constexpr float PI{3.141592f};
 
+inline float signBitToNumber(bool signBit) { return signBit ? 1.0f : -1.0f; }
+
 template <typename T>
 bool floatingPointEquality(T a, T b) {
     // Check if the numbers are really close -- needed when comparing numbers

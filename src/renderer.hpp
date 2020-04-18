@@ -22,6 +22,7 @@ class Renderer {
     const SupersamplingStrategy &superSampler;
     float exposure;
     float gamma;
+    UniformIntervalRNG generator{-1.0f, 1.0f};
 
    public:
     Renderer(const Intersectable &scene, const Light &lights, int width,
@@ -30,8 +31,8 @@ class Renderer {
 
     std::vector<int> rayTrace(const Camera &camera, int nReflexions) const;
 
-    void saveRenderer(const std::vector<int> &pixelValues,
-                      const std::string &filename) const;
+    void saveRender(const std::vector<int> &pixelValues,
+                    const std::string &filename) const;
 
     Color shootRayRecursively(const Ray &ray, int nReflexionsLeft) const;
 
@@ -41,6 +42,9 @@ class Renderer {
                   const Color &color) const;
     static void displayProgress(float progressRatio);
     static int convertTo8BitValue(float f);
+    std::vector<Vector3> getRandomReflections(const Vector3 mainDirection,
+                                              float smoothness) const;
+    static float toAngle(float f, float exponent);
 };
 
 class SupersamplingStrategy {

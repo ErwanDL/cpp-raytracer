@@ -79,5 +79,6 @@ Color PointLight::computeDiffuse(float lightDotN,
 Color PointLight::computeSpecular(float observerDotReflected,
                                   const Material& material) const {
     return std::pow(observerDotReflected, material.smoothness) *
-           material.specularColor * this->color;
+           material.specularColor * this->color *
+           (material.smoothness / (1 + material.smoothness));
 }

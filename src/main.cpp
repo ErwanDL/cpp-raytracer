@@ -38,19 +38,19 @@ int main() {
     scene.addShape(rightWall);
 
     const Sphere metalSphere{Point3(-1.0f, 1.0f, -6.0f), 1.0f,
-                             Metal(Color(0.9f, 0.7f, 0.5f), 100.0f)};
+                             Metal(Color(0.9f, 0.7f, 0.5f), 10.0f)};
     scene.addShape(metalSphere);
 
     const Sphere blueSphere{Point3(1.0f, 1.0f, -6.0f), 1.0f,
-                            Lambertian(Color(0.4f, 0.4f, 0.7f), 0.05f)};
+                            Lambertian(Color(0.4f, 0.4f, 0.7f), 0.0f, 1.0f)};
     scene.addShape(blueSphere);
 
     LightRack lightRack;
-    const AmbientLight ambient{Color(0.7f)};
+    const AmbientLight ambient{Color(0.8f)};
     lightRack.addLight(ambient);
-    const PointLight light{Point3(3.0f, 5.5f, 0.0f), Color(0.5f)};
+    const PointLight light{Point3(3.0f, 5.5f, 0.0f), Color(0.4f)};
     lightRack.addLight(light);
-    const PointLight light2{Point3(-3.0f, 5.5f, 0.0f), Color(0.5f)};
+    const PointLight light2{Point3(-3.0f, 5.5f, 0.0f), Color(0.4f)};
     lightRack.addLight(light2);
 
     constexpr int width{720};
@@ -62,10 +62,10 @@ int main() {
         static_cast<float>(width) / static_cast<float>(height)};
 
     Renderer renderer{scene, lightRack, width, height,
-                      DeterministicSupersampler(1)};
+                      DeterministicSupersampler(2)};
 
-    auto render = renderer.rayTrace(camera, 4);
-    renderer.saveRenderer(render, "scene.ppm");
+    auto render = renderer.rayTrace(camera, 1);
+    renderer.saveRender(render, "scene.ppm");
 
     return 0;
 }

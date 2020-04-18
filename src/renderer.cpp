@@ -82,12 +82,42 @@ Color Renderer::shootRayRecursively(const Ray &ray, int nReflexionsLeft) const {
     if (nReflexionsLeft == 0 || !intersection->material.isReflective()) {
         return intersectionColor;
     }
-    const Ray reflectedRay{intersection->location,
-                           ray.direction.reflected(intersection->normal)};
-    const Color reflectedColor =
-        intersection->material.specularColor *
-        shootRayRecursively(reflectedRay, nReflexionsLeft - 1);
-    return intersectionColor + reflectedColor;
+    const auto reflections =
+        getRandomReflections(ray.direction.reflected(intersection->normal),
+                             intersection->material.smoothness);
+
+    Color reflectedColor{0.0f};
+    int shotRays = 0;
+    for (const Vector3 reflection : reflections) {
+        if (reflection.dot(intersection->normal) > 0.0f) {
+            const Ray reflectedRay{intersection->location, reflection};
+            reflectedColor +=
+                shootRayRecursively(reflectedRay, nReflexionsLeft - 1);
+            shotRays += 1;
+        }
+    }
+
+    return intersectionColor +
+           intersection->material.specularColor *
+               (reflectedColor / static_cast<float>(shotRays));
+}
+
+std::vector<Vector3> Renderer::getRandomReflections(const Vector3 mainDirection,
+                                                    float smoothness) const {
+    constexpr int nReflections = 100;
+    std::vector<Vector3> reflections;
+    for (int i = 0; i < nReflections; ++i) {
+        const float theta = toAngle(generator.generate(), smoothness);
+        const float phi = toAngle(generator.generate(), smoothness);
+        reflections.push_back(
+            Vector3::sphericallyRotated(mainDirection, theta, phi));
+    }
+    return reflections;
+}
+
+float Renderer::toAngle(float f, float exponent) {
+    return Math::signBitToNumber(std::signbit(f)) *
+           std::asin(std::pow(std::abs(f), exponent));
 }
 
 Vector2 Renderer::screenCoordinateFromXY(float x, float y) const {
@@ -95,8 +125,8 @@ Vector2 Renderer::screenCoordinateFromXY(float x, float y) const {
             -2.0f * y / static_cast<float>(height) + 1.0f};
 }
 
-void Renderer::saveRenderer(const std::vector<int> &pixelValues,
-                            const std::string &filename) const {
+void Renderer::saveRender(const std::vector<int> &pixelValues,
+                          const std::string &filename) const {
     std::ofstream renderer{filename};
     renderer << "P3" << '\n';
     renderer << width << ' ' << height << '\n';

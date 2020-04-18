@@ -22,6 +22,7 @@ struct Color final {
 Color operator*(const Color &c1, const Color &c2);
 Color operator*(float f, const Color &c);
 Color operator*(const Color &c, float f);
+Color operator/(const Color &c, float f);
 Color operator+(const Color &c1, const Color &c2);
 std::ostream &operator<<(std::ostream &out, const Color &color);
 
