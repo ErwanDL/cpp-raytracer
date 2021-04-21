@@ -6,4 +6,4 @@ build/*
 .DS_Store
 compile_commands.json
 c_cpp_properties.json
-TODO.md
+.venv/

@@ -2,7 +2,7 @@
 
 This is a personal project in which I build a raytracer with incremental features, that I started to learn modern C++ and computer graphics !
 
-![Example image](./example.png)
+![Example image](./scene.png)
 
 ## Running the project
 
@@ -37,8 +37,6 @@ If you want to change the rendered scene, you can do so in `src/main.cpp`.
 -   [x] Cast shadows
 -   [x] Specular highlights (Phong illumination model)
 -   [x] Perfect reflections
--   [x] Anti-aliasing (via deterministic supersampling)
--   [x] Anti-aliasing (via stochastic supersampling)
 -   [x] Progress bar
 -   [x] Glossy reflections
 -   [ ] Texture mapping

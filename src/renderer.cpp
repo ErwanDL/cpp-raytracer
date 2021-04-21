@@ -1,5 +1,6 @@
 #include "renderer.hpp"
 
+#include <chrono>
 #include <cmath>
 #include <fstream>
 #include <string>
@@ -7,51 +8,37 @@
 #include <vector>
 
 #include "light.hpp"
-#include "random.hpp"
+#include "ray.hpp"
 #include "shape.hpp"
 #include "utils.hpp"
 #include "vectors.hpp"
 
-Renderer::Renderer(const Intersectable &scene, const Light &lights, int width,
-                   int height, const ReflectionGenerator &reflectionGenerator,
-                   const SupersamplingStrategy &superSampler, float exposure,
-                   float gamma)
-    : scene(scene),
-      lights(lights),
-      width(width),
-      height(height),
-      reflectionGenerator(reflectionGenerator),
-      superSampler(superSampler),
-      exposure(exposure),
-      gamma(gamma) {}
+Renderer::Renderer(const Intersectable& scene, const Light& lights, int width, int height,
+                   float exposure, float gamma)
+    : scene(scene), lights(lights), width(width), height(height), exposure(exposure), gamma(gamma) {
+}
 
-std::vector<int> Renderer::rayTrace(const Camera &camera, int nBounces) const {
+std::vector<int> Renderer::rayTrace(const Camera& camera, int nBounces,
+                                    int maxReflectionSamples) const {
     std::vector<int> pixelValues(width * height * 3, 0);
     const auto start = std::chrono::steady_clock::now();
     std::cout << "Starting render...\n";
 
     for (int x{0}; x < width; ++x) {
         displayProgress(static_cast<float>(x) / static_cast<float>(width));
-        for (int y{0}; y < height; ++y) {
-            const auto offsets = superSampler.getSupersamplingOffsets();
-            Color averageColor{0.0f};
-            for (const auto offset : offsets) {
-                const Vector2 screenCoord = screenCoordinateFromXY(
-                    static_cast<float>(x) + offset.first,
-                    static_cast<float>(y) + offset.second);
-                const Ray initialRay = camera.makeRay(screenCoord);
-                averageColor += shootRayRecursively(initialRay, nBounces);
-            }
-            averageColor /= static_cast<float>(offsets.size());
-            setPixel(pixelValues, y, x,
-                     averageColor.gammaCorrected(exposure, gamma));
+        for (int y = 0; y < height; ++y) {
+            const Vector2 screenCoord =
+                screenCoordinateFromXY(static_cast<float>(x), static_cast<float>(y));
+            const Ray initialRay = camera.makeRay(screenCoord);
+            auto color = shootRayRecursively(initialRay, nBounces, maxReflectionSamples);
+
+            setPixel(pixelValues, y, x, color.gammaCorrected(exposure, gamma));
         }
     }
 
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now() - start);
-    std::cout << "\nScene rendered in "
-              << static_cast<float>(duration.count()) / 1000.0f
+    std::cout << "\nScene rendered in " << static_cast<float>(duration.count()) / 1000.0f
               << " seconds.\n";
 
     return pixelValues;
@@ -67,52 +54,49 @@ void Renderer::displayProgress(float progressRatio) {
     for (int i = nSquares; i < nChars; ++i) {
         progressBar.append("-");
     }
-    std::cout << '\r' << progressBar << ' '
-              << static_cast<int>(std::round(100 * progressRatio)) << '%'
-              << std::flush;
+    std::cout << '\r' << progressBar << ' ' << static_cast<int>(std::round(100 * progressRatio))
+              << '%' << std::flush;
 }
 
-Color Renderer::shootRayRecursively(const Ray &ray, int nBouncesLeft) const {
+Color Renderer::shootRayRecursively(const Ray& ray, int nBouncesLeft,
+                                    int maxReflectionSamples) const {
     const auto intersection = scene.intersect(ray);
     if (!intersection) {
         return skyColor;
     }
-    const Color intersectionColor =
-        lights.illuminate(intersection.value(), scene, ray.origin);
+    const Color intersectionColor = lights.illuminate(intersection.value(), scene, ray.origin);
 
-    if (nBouncesLeft == 0 || intersection->material.specularity() < 0.01f) {
+    if (nBouncesLeft == 0 || intersection->material.specularity < 1.0f) {
         return intersectionColor;
     }
 
-    const Vector3 perfectReflectionDirection =
-        ray.direction.reflected(intersection->normal);
-
-    auto reflections = reflectionGenerator.getRandomReflections(
-        perfectReflectionDirection, intersection->material);
+    const Vector3 perfectReflectionDirection = ray.direction.reflected(intersection->normal);
 
     Color reflectedColor{0.0f};
-    int shotRays = 0;
-    for (const Vector3 reflection : reflections) {
-        if (reflection.dot(intersection->normal) > 0.0f) {
-            const Ray reflectedRay{intersection->location, reflection};
-            reflectedColor +=
-                shootRayRecursively(reflectedRay, nBouncesLeft - 1);
-            shotRays += 1;
+    int nSamples = 1 + maxReflectionSamples;
+    for (int i = 0; i < nSamples; ++i) {
+        Vector3 sampledDirection =
+            Math::sampleHemisphere(perfectReflectionDirection, intersection->material.roughness);
+        // Reflected rays that would shoot beneath the surface are reflected about the
+        // perfect reflection direction, back above the surface
+        if (sampledDirection.dot(intersection->normal) < 0.0f) {
+            sampledDirection = (-sampledDirection).reflected(perfectReflectionDirection);
         }
+        const Ray reflectedRay{intersection->location, sampledDirection};
+        reflectedColor += shootRayRecursively(reflectedRay, nBouncesLeft - 1, maxReflectionSamples);
     }
 
-    return intersectionColor +
-           intersection->material.specularColor *
-               (reflectedColor / static_cast<float>(shotRays));
+    return intersectionColor + intersection->material.specularColor *
+                                   (reflectedColor / static_cast<float>(nSamples)) *
+                                   intersection->material.specularity;
 }
 
-Vector2 Renderer::screenCoordinateFromXY(float x, float y) const {
-    return {2.0f * x / static_cast<float>(width) - 1.0f,
-            -2.0f * y / static_cast<float>(height) + 1.0f};
+Vector2 Renderer::screenCoordinateFromXY(int x, int y) const {
+    return {2.0f * static_cast<float>(x) / static_cast<float>(width) - 1.0f,
+            -2.0f * static_cast<float>(y) / static_cast<float>(height) + 1.0f};
 }
 
-void Renderer::saveRender(const std::vector<int> &pixelValues,
-                          const std::string &filename) const {
+void Renderer::saveRender(const std::vector<int>& pixelValues, const std::string& filename) const {
     std::ofstream renderer{filename};
     renderer << "P3" << '\n';
     renderer << width << ' ' << height << '\n';
@@ -125,14 +109,11 @@ void Renderer::saveRender(const std::vector<int> &pixelValues,
     renderer.close();
 }
 
-void Renderer::setPixel(std::vector<int> &pixelValues, int row, int col,
-                        const Color &color) const {
+void Renderer::setPixel(std::vector<int>& pixelValues, int row, int col, const Color& color) const {
     int redIndex{width * row * 3 + col * 3};
     pixelValues.at(redIndex) = convertTo8BitValue(color.r);
     pixelValues.at(redIndex + 1) = convertTo8BitValue(color.g);
     pixelValues.at(redIndex + 2) = convertTo8BitValue(color.b);
 }
 
-int Renderer::convertTo8BitValue(float f) {
-    return static_cast<int>(std::round(f * 255));
-}
+int Renderer::convertTo8BitValue(float f) { return static_cast<int>(std::round(f * 255)); }

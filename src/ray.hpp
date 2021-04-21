@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include "material.hpp"
-#include "renderer.hpp"
 #include "vectors.hpp"
 
 struct Ray {
@@ -15,18 +13,8 @@ struct Ray {
     Vector3 direction;
     float maxDist;
 
-    Ray(const Point3 &origin, const Vector3 &direction,
-        float maxDist = MAX_RAY_DIST);
+    Ray(const Point3& origin, const Vector3& direction, float maxDist = MAX_RAY_DIST);
 
     bool isValidRayDistance(float t) const;
-};
-struct Intersection {
-    Point3 location;
-    Vector3 normal;
-    float distanceToRayOrigin;
-    Material material;
-
-    Intersection(Point3 location, const Vector3 &normal,
-                 float distanceToRayOrigin, const Material &material);
 };
 #endif

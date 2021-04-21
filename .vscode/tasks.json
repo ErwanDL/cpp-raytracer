@@ -12,7 +12,9 @@
         {
             "label": "Build & Run project",
             "type": "shell",
-            "dependsOn": ["Build project"],
+            "dependsOn": [
+                "Build project"
+            ],
             "command": "./build/raytracer",
             "group": {
                 "kind": "build",
@@ -20,9 +22,9 @@
             }
         },
         {
-            "label": "Build & Run tests",
+            "label": "Build & Run test file",
             "type": "shell",
-            "command": "cd build && make runtests && ./runtests",
+            "command": "cd build && make test && ./test",
             "group": {
                 "kind": "test",
                 "isDefault": true

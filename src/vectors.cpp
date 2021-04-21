@@ -10,25 +10,25 @@
 Vector3::Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
 Vector3::Vector3(float f) : x(f), y(f), z(f) {}
 
-Vector3 &Vector3::operator+=(const Vector3 &other) {
+Vector3& Vector3::operator+=(const Vector3& other) {
     x += other.x;
     y += other.y;
     z += other.z;
     return *this;
 }
-Vector3 &Vector3::operator-=(const Vector3 &other) {
+Vector3& Vector3::operator-=(const Vector3& other) {
     x -= other.x;
     y -= other.y;
     z -= other.z;
     return *this;
 }
-Vector3 &Vector3::operator*=(float f) {
+Vector3& Vector3::operator*=(float f) {
     x *= f;
     y *= f;
     z *= f;
     return *this;
 }
-Vector3 &Vector3::operator/=(float f) {
+Vector3& Vector3::operator/=(float f) {
     x /= f;
     y /= f;
     z /= f;
@@ -37,39 +37,27 @@ Vector3 &Vector3::operator/=(float f) {
 
 Vector3 Vector3::operator-() const { return Vector3(-x, -y, -z); }
 
-bool Vector3::operator==(const Vector3 &other) const {
-    return Math::floatingPointEquality(x, other.x) &&
-           Math::floatingPointEquality(y, other.y) &&
+bool Vector3::operator==(const Vector3& other) const {
+    return Math::floatingPointEquality(x, other.x) && Math::floatingPointEquality(y, other.y) &&
            Math::floatingPointEquality(z, other.z);
 }
 
-Vector3 operator+(const Vector3 &v1, const Vector3 &v2) {
-    return Vector3(v1.getX() + v2.getX(), v1.getY() + v2.getY(),
-                   v1.getZ() + v2.getZ());
+Vector3 operator+(const Vector3& v1, const Vector3& v2) {
+    return Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 }
-Vector3 operator-(const Vector3 &v1, const Vector3 &v2) {
-    return Vector3(v1.getX() - v2.getX(), v1.getY() - v2.getY(),
-                   v1.getZ() - v2.getZ());
+Vector3 operator-(const Vector3& v1, const Vector3& v2) {
+    return Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
 }
-Vector3 operator*(const Vector3 &v, float f) {
-    return Vector3(v.getX() * f, v.getY() * f, v.getZ() * f);
-}
-Vector3 operator*(float f, const Vector3 &v) {
-    return Vector3(v.getX() * f, v.getY() * f, v.getZ() * f);
-}
-Vector3 operator/(const Vector3 &v, float f) {
-    return Vector3(v.getX() / f, v.getY() / f, v.getZ() / f);
-}
+Vector3 operator*(const Vector3& v, float f) { return Vector3(v.x * f, v.y * f, v.z * f); }
+Vector3 operator*(float f, const Vector3& v) { return Vector3(v.x * f, v.y * f, v.z * f); }
+Vector3 operator/(const Vector3& v, float f) { return Vector3(v.x / f, v.y / f, v.z / f); }
 
-std::ostream &operator<<(std::ostream &out, const Vector3 &v) {
-    out << "Vector3(" << v.getX() << ", " << v.getY() << ", " << v.getZ()
-        << ')';
+std::ostream& operator<<(std::ostream& out, const Vector3& v) {
+    out << "Vector3(" << v.x << ", " << v.y << ", " << v.z << ')';
     return out;
 }
 
-float Vector3::lengthSquared() const {
-    return Math::sqr(x) + Math::sqr(y) + Math::sqr(z);
-}
+float Vector3::lengthSquared() const { return Math::sqr(x) + Math::sqr(y) + Math::sqr(z); }
 
 float Vector3::length() const { return std::sqrt(lengthSquared()); }
 
@@ -84,34 +72,18 @@ Vector3 Vector3::normalized() const {
     return v;
 }
 
-float Vector3::dot(const Vector3 &other) const {
-    return x * other.x + y * other.y + z * other.z;
+float Vector3::dot(const Vector3& other) const { return x * other.x + y * other.y + z * other.z; }
+
+Vector3 Vector3::cross(const Vector3& other) const {
+    return Vector3(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x);
 }
 
-Vector3 Vector3::cross(const Vector3 &other) const {
-    return Vector3(y * other.z - z * other.y, z * other.x - x * other.z,
-                   x * other.y - y * other.x);
+/* Produces a reflection like this :
+https://docs.unity3d.com/StaticFiles/ScriptRefImages/Vec3ReflectDiagram.png */
+Vector3 Vector3::reflected(const Vector3& normal) const {
+    auto v = normal.normalized();
+    return *this - 2 * dot(v) * v;
 }
-
-Vector3 Vector3::reflected(const Vector3 &normal) const {
-    const auto normalizedNormal = normal.normalized();
-    return *this - 2 * dot(normalizedNormal) * normalizedNormal;
-}
-
-Vector3 Vector3::sphericallyRotated(const Vector3 &normalizedDirection,
-                                    float theta, float phi) {
-    float originalTheta =
-        std::atan2(normalizedDirection.getY(), normalizedDirection.getX());
-    float originalPhi = std::acos(normalizedDirection.getZ());
-    float newX = std::sin(originalPhi + phi) * std::cos(originalTheta + theta);
-    float newY = std::sin(originalPhi + phi) * std::sin(originalTheta + theta);
-    float newZ = std::cos(originalPhi + phi);
-    return {newX, newY, newZ};
-}
-
-float Vector3::getX() const { return x; }
-float Vector3::getY() const { return y; }
-float Vector3::getZ() const { return z; }
 
 // CLASS VECTOR2
 
@@ -133,31 +105,27 @@ Vector2 Vector2::normalized() const {
     return v;
 }
 
-Vector2 &Vector2::operator+=(const Vector2 &other) {
+Vector2& Vector2::operator+=(const Vector2& other) {
     u += other.u;
     v += other.v;
     return *this;
 }
-Vector2 &Vector2::operator-=(const Vector2 &other) {
+Vector2& Vector2::operator-=(const Vector2& other) {
     u -= other.u;
     v -= other.v;
     return *this;
 }
-Vector2 &Vector2::operator*=(float f) {
+Vector2& Vector2::operator*=(float f) {
     u *= f;
     v *= f;
     return *this;
 }
-Vector2 &Vector2::operator/=(float f) {
+Vector2& Vector2::operator/=(float f) {
     u /= f;
     v /= f;
     return *this;
 }
 
-bool Vector2::operator==(const Vector2 &other) const {
-    return Math::floatingPointEquality(u, other.u) &&
-           Math::floatingPointEquality(v, other.v);
+bool Vector2::operator==(const Vector2& other) const {
+    return Math::floatingPointEquality(u, other.u) && Math::floatingPointEquality(v, other.v);
 }
-
-float Vector2::getU() const { return u; }
-float Vector2::getV() const { return v; }
