@@ -65,8 +65,9 @@ Color Renderer::shootRayRecursively(const Ray& ray, int nBouncesLeft,
         return skyColor;
     }
     const Color intersectionColor = lights.illuminate(intersection.value(), scene, ray.origin);
+    const Material& material = intersection->material;
 
-    if (nBouncesLeft == 0 || intersection->material.specularity < 1.0f) {
+    if (nBouncesLeft == 0 || material.specularity < 1.0f) {
         return intersectionColor;
     }
 
@@ -76,7 +77,7 @@ Color Renderer::shootRayRecursively(const Ray& ray, int nBouncesLeft,
     int nSamples = 1 + maxReflectionSamples;
     for (int i = 0; i < nSamples; ++i) {
         Vector3 sampledDirection =
-            Math::sampleHemisphere(perfectReflectionDirection, intersection->material.roughness);
+            Math::sampleHemisphere(perfectReflectionDirection, material.smoothness);
         // Reflected rays that would shoot beneath the surface are reflected about the
         // perfect reflection direction, back above the surface
         if (sampledDirection.dot(intersection->normal) < 0.0f) {
@@ -85,10 +86,10 @@ Color Renderer::shootRayRecursively(const Ray& ray, int nBouncesLeft,
         const Ray reflectedRay{intersection->location, sampledDirection};
         reflectedColor += shootRayRecursively(reflectedRay, nBouncesLeft - 1, maxReflectionSamples);
     }
+    reflectedColor /= nSamples;
 
-    return intersectionColor + intersection->material.specularColor *
-                                   (reflectedColor / static_cast<float>(nSamples)) *
-                                   intersection->material.specularity;
+    return intersectionColor +
+           reflectedColor * (material.metal ? material.albedo : material.specularity);
 }
 
 Vector2 Renderer::screenCoordinateFromXY(int x, int y) const {

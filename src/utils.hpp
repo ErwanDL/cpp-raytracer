@@ -18,13 +18,13 @@ inline float random() {
     return distribution(generator);
 }
 
-inline Vector3 sampleHemisphere(const Vector3& zenithDirection, float roughness) {
+inline Vector3 sampleHemisphere(const Vector3& zenithDirection, float smoothness) {
     // One of the many ways to get an orthogonal basis from the zenith direction.
     auto u = Vector3(-zenithDirection.y, zenithDirection.x, 0.0f).normalized();
     auto v = zenithDirection.cross(u);
 
-    // polar angle, with the roughness exponent applied to the cosine distribution
-    float theta = std::acos(std::pow(random(), roughness));
+    // polar angle, with the smoothness exponent applied to the cosine distribution
+    float theta = std::acos(std::pow(random(), 1.0f / smoothness));
     float phi = 2.0f * PI * random(); // azimuth, with u as the reference for 0 azimuth
 
     return std::cos(theta) * zenithDirection + std::sin(theta) * std::cos(phi) * u +

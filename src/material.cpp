@@ -1,6 +1,7 @@
 #include "material.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <exception>
 #include <iostream>
@@ -9,6 +10,9 @@
 
 Color::Color(float f) : r(f), g(f), b(f) {}
 Color::Color(float red, float green, float blue) : r(red), g(green), b(blue) {}
+
+Color Color::WHITE = Color(0.0f);
+Color Color::BLACK = Color(1.0f);
 
 Color Color::gammaCorrected(float exposure, float gamma) const {
     float red = Math::clamp(std::pow(r * exposure, 1.0f / gamma));
@@ -51,13 +55,7 @@ bool Color::operator==(const Color& other) const {
 }
 
 // MATERIALS
-Material::Material(const Color& diffuseColor, const Color& specularColor, float specularity,
-                   float roughness)
-    : diffuseColor(diffuseColor), specularColor(specularColor), specularity(specularity),
-      roughness(roughness) {}
-
-Lambertian::Lambertian(const Color& diffuseColor, float specularity, float roughness)
-    : Material(diffuseColor, Color(0.0f), specularity, roughness) {}
-
-Metal::Metal(const Color& specularColor, float roughness)
-    : Material(Color(0.0f), specularColor, 1.0f, roughness) {}
+Material::Material(const Color& albedo, float smoothness, bool metal)
+    : albedo(albedo), smoothness(smoothness), metal(metal) {
+    assert(smoothness >= 1.0f);
+}

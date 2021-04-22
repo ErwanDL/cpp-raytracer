@@ -13,7 +13,7 @@
 
 int main() {
     Scene scene;
-    const Lambertian wallWhite{Color(0.8f)};
+    const Material wallWhite{Color(0.8f)};
 
     auto floor{
         std::make_shared<Plane>(Point3(0.0f, 0.0f, -10.0f), Vector3(0.0f, 1.0f, 0.0f), wallWhite)};
@@ -32,23 +32,23 @@ int main() {
     scene.addShape(ceiling);
 
     auto leftWall{std::make_shared<Plane>(Point3(-4.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f),
-                                          Lambertian(Color(0.8f, 0.4f, 0.4f)))};
+                                          Material(Color(0.8f, 0.4f, 0.4f)))};
     scene.addShape(leftWall);
 
     auto rightWall{std::make_shared<Plane>(Point3(4.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f),
-                                           Lambertian(Color(0.4f, 0.8f, 0.4f)))};
+                                           Material(Color(0.4f, 0.8f, 0.4f)))};
     scene.addShape(rightWall);
 
     auto metalSphere{std::make_shared<Sphere>(Point3(-2.0f, 1.0f, -6.0f), 1.0f,
-                                              Metal(Color(0.8f, 0.6f, 0.4f), 0.1f))};
+                                              Material(Color(0.8f, 0.6f, 0.4f), 10.0f, true))};
     scene.addShape(metalSphere);
 
     auto blueSphere{std::make_shared<Sphere>(Point3(0.0f, 1.0f, -6.0f), 1.0f,
-                                             Lambertian(Color(0.35f, 0.45f, 0.65f)))};
+                                             Material(Color(0.35f, 0.45f, 0.65f)))};
     scene.addShape(blueSphere);
 
-    auto mirrorSphere{
-        std::make_shared<Sphere>(Point3(2.0f, 1.0f, -6.0f), 1.0f, Metal(0.8f, 0.0001f))};
+    auto mirrorSphere{std::make_shared<Sphere>(Point3(2.0f, 1.0f, -6.0f), 1.0f,
+                                               Material(Color::WHITE, 1000.0f, true))};
     scene.addShape(mirrorSphere);
 
     LightRack lightRack;
