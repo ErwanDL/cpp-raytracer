@@ -10,7 +10,7 @@
 
 Color AmbientLight::illuminate(const Intersection& intersection, const Scene&,
                                const Point3&) const {
-    return intersection.material.albedo * color;
+    return intersection.material.get().albedo * color;
 }
 
 Color PointLight::illuminate(const Intersection& intersection, const Scene& scene,
@@ -36,10 +36,11 @@ Color PointLight::illuminate(const Intersection& intersection, const Scene& scen
     const float observerDotReflected =
         towardsObserver.dot(fromLight.reflected(intersection.normal));
 
-    const Color diffuseColor = computeDiffuse(lightDotN, intersection.material);
-    const Color specularColor = observerDotReflected < 0.0f
-                                    ? Color(0.0f)
-                                    : computeSpecular(observerDotReflected, intersection.material);
+    const Color diffuseColor = computeDiffuse(lightDotN, intersection.material.get());
+    const Color specularColor =
+        observerDotReflected < 0.0f
+            ? Color(0.0f)
+            : computeSpecular(observerDotReflected, intersection.material.get());
 
     return diffuseColor + specularColor;
 }
