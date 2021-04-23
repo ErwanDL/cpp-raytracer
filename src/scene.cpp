@@ -61,7 +61,7 @@ Color Scene::computeIndirectLighting(const Intersection& intersection,
         Ray reflectedRay{intersection.location, sampledDirection};
         Color incomingLight = shootRay(reflectedRay, nBounces);
 
-        return incomingLight * (material.metal ? material.albedo : material.specularity);
+        return incomingLight * (material.metal ? material.albedo : 1.0f);
     } else {
         // refract the ray : diffuse
         Vector3 sampledDirection = sampleHemisphere(intersection.normal, 1.0f);
