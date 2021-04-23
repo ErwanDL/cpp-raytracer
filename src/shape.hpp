@@ -1,49 +1,23 @@
 #ifndef SHAPE_HPP
 #define SHAPE_HPP
 
+#include "intersection.hpp"
+#include "material.hpp"
+#include "vector3.hpp"
 #include <memory>
 #include <optional>
 #include <vector>
-
-#include "material.hpp"
-#include "vectors.hpp"
-
-struct Ray;
-class Shape;
-
-struct Intersection {
-    Point3 location;
-    Vector3 normal;
-    float distanceToRayOrigin;
-    Material material;
-
-    Intersection(Point3 location, const Vector3& normal, float distanceToRayOrigin,
-                 const Material& material)
-        : location(location), normal(normal), distanceToRayOrigin(distanceToRayOrigin),
-          material(material) {}
-};
 
 class Intersectable {
   public:
     virtual std::optional<Intersection> intersect(const Ray& ray) const = 0;
 };
 
-class Scene : public Intersectable {
-  private:
-    std::vector<std::shared_ptr<Shape>> shapes{};
-
-  public:
-    Scene();
-
-    void addShape(std::shared_ptr<Shape> shape);
-    std::optional<Intersection> intersect(const Ray& ray) const override;
-};
-
 class Shape : public Intersectable {
-  public:
+  protected:
     Material material;
 
-    explicit Shape(const Material& material);
+    Shape(const Material& material);
 };
 
 class Plane : public Shape {

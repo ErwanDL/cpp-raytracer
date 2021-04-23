@@ -1,14 +1,7 @@
-#include "vectors.hpp"
-
+#include "vector3.hpp"
+#include "utils.hpp"
 #include <cmath>
 #include <iostream>
-
-#include "utils.hpp"
-
-// CLASS VECTOR3
-
-Vector3::Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
-Vector3::Vector3(float f) : x(f), y(f), z(f) {}
 
 Vector3& Vector3::operator+=(const Vector3& other) {
     x += other.x;
@@ -52,11 +45,6 @@ Vector3 operator*(const Vector3& v, float f) { return Vector3(v.x * f, v.y * f, 
 Vector3 operator*(float f, const Vector3& v) { return Vector3(v.x * f, v.y * f, v.z * f); }
 Vector3 operator/(const Vector3& v, float f) { return Vector3(v.x / f, v.y / f, v.z / f); }
 
-std::ostream& operator<<(std::ostream& out, const Vector3& v) {
-    out << "Vector3(" << v.x << ", " << v.y << ", " << v.z << ')';
-    return out;
-}
-
 float Vector3::lengthSquared() const { return Math::sqr(x) + Math::sqr(y) + Math::sqr(z); }
 
 float Vector3::length() const { return std::sqrt(lengthSquared()); }
@@ -83,49 +71,4 @@ https://docs.unity3d.com/StaticFiles/ScriptRefImages/Vec3ReflectDiagram.png */
 Vector3 Vector3::reflected(const Vector3& normal) const {
     auto v = normal.normalized();
     return *this - 2 * dot(v) * v;
-}
-
-// CLASS VECTOR2
-
-Vector2::Vector2(float u, float v) : u(u), v(v) {}
-Vector2::Vector2(float f) : u(f), v(f) {}
-
-float Vector2::lengthSquared() const { return Math::sqr(u) + Math::sqr(v); }
-
-float Vector2::length() const { return std::sqrt(lengthSquared()); }
-
-void Vector2::normalize() {
-    const float l = length();
-    *this /= l;
-}
-
-Vector2 Vector2::normalized() const {
-    Vector2 v{*this};
-    v.normalize();
-    return v;
-}
-
-Vector2& Vector2::operator+=(const Vector2& other) {
-    u += other.u;
-    v += other.v;
-    return *this;
-}
-Vector2& Vector2::operator-=(const Vector2& other) {
-    u -= other.u;
-    v -= other.v;
-    return *this;
-}
-Vector2& Vector2::operator*=(float f) {
-    u *= f;
-    v *= f;
-    return *this;
-}
-Vector2& Vector2::operator/=(float f) {
-    u /= f;
-    v /= f;
-    return *this;
-}
-
-bool Vector2::operator==(const Vector2& other) const {
-    return Math::floatingPointEquality(u, other.u) && Math::floatingPointEquality(v, other.v);
 }

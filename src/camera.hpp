@@ -1,31 +1,30 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
-#include "vectors.hpp"
 
-struct Ray;
+#include "ray.hpp"
+#include "vector3.hpp"
+#include <cmath>
 
-class Camera {
-   public:
-    virtual Ray makeRay(const Point2 &point) const = 0;
-    virtual const Point3 &getLocation() const = 0;
-};
-
-class PerspectiveCamera : public Camera {
-   private:
+class PerspectiveCamera {
+  private:
     Point3 location;
     Vector3 forward;
-    Vector3 up;
     Vector3 right;
+    Vector3 up;
+    float maxV;
 
-    float height;
-    float width;
+  public:
+    PerspectiveCamera(const Point3& location, const Point3& target, float vfov)
+        : location(location), forward((target - location).normalized()),
+          right(forward.cross(Vector3(0.0f, 1.0f, 0.0f)).normalized()), up(right.cross(forward)),
+          maxV(std::tan(vfov / 2)) {}
 
-   public:
-    PerspectiveCamera(const Point3 &location, const Point3 &target,
-                      const Vector3 &upguide, float fov, float aspectRatio);
-    Ray makeRay(const Point2 &point) const override;
-
-    const Point3 &getLocation() const override;
+    Ray makeRay(int x, int y, int width, int height) const {
+        float u = 2.0f * (static_cast<float>(x) - static_cast<float>(width) / 2.0f) / height;
+        float v = 2.0f * (static_cast<float>(height) / 2.0f - static_cast<float>(y)) / height;
+        Vector3 direction{forward + u * maxV * right + v * up * maxV};
+        return Ray(location, direction);
+    }
 };
 
 #endif

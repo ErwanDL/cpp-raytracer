@@ -1,40 +1,19 @@
 #include "light.hpp"
-
+#include "ray.hpp"
+#include "scene.hpp"
+#include "shape.hpp"
+#include "trace.hpp"
+#include "vector3.hpp"
 #include <cmath>
 #include <utility>
 #include <vector>
 
-#include "ray.hpp"
-#include "shape.hpp"
-#include "vectors.hpp"
-
-// CLASS LIGHTRACK
-
-void LightRack::addLight(const Light& light) { lights.push_back(&light); }
-
-Color LightRack::illuminate(const Intersection& intersection, const Intersectable& scene,
-                            const Point3& observerLocation) const {
-    Color resultingColor{0.0f};
-
-    for (const Light* pLight : lights) {
-        resultingColor += pLight->illuminate(intersection, scene, observerLocation);
-    }
-    return resultingColor;
-}
-
-// CLASS AMBIENTLIGHT
-AmbientLight::AmbientLight(const Color& color) : color(color) {}
-
-Color AmbientLight::illuminate(const Intersection& intersection, const Intersectable&,
+Color AmbientLight::illuminate(const Intersection& intersection, const Scene&,
                                const Point3&) const {
     return intersection.material.albedo * color;
 }
 
-// CLASS POINTLIGHT
-
-PointLight::PointLight(const Point3& origin, const Color& color) : origin(origin), color(color) {}
-
-Color PointLight::illuminate(const Intersection& intersection, const Intersectable& scene,
+Color PointLight::illuminate(const Intersection& intersection, const Scene& scene,
                              const Point3& observerLocation) const {
     const Vector3 fromLight = (intersection.location - origin).normalized();
     const float lightDotN = -fromLight.dot(intersection.normal);
@@ -47,7 +26,7 @@ Color PointLight::illuminate(const Intersection& intersection, const Intersectab
     // in which case a shadow is cast
     Ray rayTowardsLight{intersection.location, -fromLight,
                         (origin - intersection.location).length()};
-    const auto shadowIntersection = scene.intersect(rayTowardsLight);
+    const auto shadowIntersection = scene.findFirstIntersection(rayTowardsLight);
 
     if (shadowIntersection) {
         return Color(0.0f);
@@ -66,10 +45,10 @@ Color PointLight::illuminate(const Intersection& intersection, const Intersectab
 }
 
 Color PointLight::computeDiffuse(float lightDotN, const Material& material) const {
-    return lightDotN * color * material.albedo;
+    return material.metal ? Color::BLACK : lightDotN * color * material.albedo;
 }
 
 Color PointLight::computeSpecular(float observerDotReflected, const Material& material) const {
-    return std::pow(observerDotReflected, material.smoothness) * color *
+    return std::pow(observerDotReflected, std::min(material.smoothness, 500.0f)) * color *
            (material.metal ? material.albedo : material.specularity);
 }

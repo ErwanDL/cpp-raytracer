@@ -6,70 +6,49 @@
 #include "camera.hpp"
 #include "light.hpp"
 #include "material.hpp"
-#include "renderer.hpp"
+#include "save_render.hpp"
+#include "scene.hpp"
 #include "shape.hpp"
+#include "trace.hpp"
 #include "utils.hpp"
-#include "vectors.hpp"
+#include "vector3.hpp"
 
 int main() {
-    Scene scene;
-    const Material wallWhite{Color(0.8f)};
+    std::vector<std::shared_ptr<Shape>> shapes{{
+        std::make_shared<Plane>(Point3(0.0f, 0.0f, -10.0f), Vector3(0.0f, 1.0f, 0.0f), // floor
+                                Color::WHITE),
+        std::make_shared<Plane>(Point3(0.0f, 0.0f, -10.0f),
+                                Vector3(0.0f, 0.0f, -1.0f), // front wall
+                                Color::WHITE),
+        std::make_shared<Plane>(Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, -1.0f), // back wall
+                                Color::WHITE),
+        std::make_shared<Plane>(Point3(0.0f, 9.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f), // ceiling
+                                Color::WHITE),
+        std::make_shared<Plane>(Point3(-4.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), // left wall
+                                Material(Color(0.9f, 0.4f, 0.4f))),
+        std::make_shared<Plane>(Point3(4.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f), // right wall
+                                Material(Color(0.4f, 0.9f, 0.4f))),
+        std::make_shared<Sphere>(Point3(-2.0f, 1.0f, -6.0f), 1.0f, // glossy sphere
+                                 Material(Color(0.8f, 0.6f, 0.4f), 10.0f, true)),
+        std::make_shared<Sphere>(Point3(0.0f, 1.0f, -6.0f), 1.0f, // diffuse sphere
+                                 Material(Color(0.35f, 0.45f, 0.8f))),
+        std::make_shared<Sphere>(Point3(2.0f, 1.0f, -6.0f), 1.0f, // mirror sphere
+                                 Material(Color(0.5f), 100000.0f, true)),
+    }};
+    std::vector<std::shared_ptr<Light>> lights{
+        std::make_shared<AmbientLight>(Color(0.2f)),
+        std::make_shared<PointLight>(Point3(3.0f, 7.0f, -3.0f), Color(0.4f)),
+        std::make_shared<PointLight>(Point3(-3.0f, 7.0f, -3.0f), Color(0.4f)),
+    };
 
-    auto floor{
-        std::make_shared<Plane>(Point3(0.0f, 0.0f, -10.0f), Vector3(0.0f, 1.0f, 0.0f), wallWhite)};
-    scene.addShape(floor);
+    Scene scene{shapes, lights};
 
-    auto backWall{
-        std::make_shared<Plane>(Point3(0.0f, 0.0f, -10.0f), Vector3(0.0f, 0.0f, -1.0f), wallWhite)};
-    scene.addShape(backWall);
+    RenderParams params{720, 480, 3, 20};
 
-    auto cameraWall{
-        std::make_shared<Plane>(Point3(0.0f, 0.0f, 0.5f), Vector3(0.0f, 0.0f, 1.0f), wallWhite)};
-    scene.addShape(cameraWall);
+    PerspectiveCamera camera{Point3(0.0f, 4.0f, 0.0f), Vector3(0.0f, 0.0f, -10.0f), Math::PI / 4};
 
-    auto ceiling{
-        std::make_shared<Plane>(Point3(0.0f, 9.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f), wallWhite)};
-    scene.addShape(ceiling);
-
-    auto leftWall{std::make_shared<Plane>(Point3(-4.0f, 0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f),
-                                          Material(Color(0.8f, 0.4f, 0.4f)))};
-    scene.addShape(leftWall);
-
-    auto rightWall{std::make_shared<Plane>(Point3(4.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f),
-                                           Material(Color(0.4f, 0.8f, 0.4f)))};
-    scene.addShape(rightWall);
-
-    auto metalSphere{std::make_shared<Sphere>(Point3(-2.0f, 1.0f, -6.0f), 1.0f,
-                                              Material(Color(0.8f, 0.6f, 0.4f), 10.0f, true))};
-    scene.addShape(metalSphere);
-
-    auto blueSphere{std::make_shared<Sphere>(Point3(0.0f, 1.0f, -6.0f), 1.0f,
-                                             Material(Color(0.35f, 0.45f, 0.65f)))};
-    scene.addShape(blueSphere);
-
-    auto mirrorSphere{std::make_shared<Sphere>(Point3(2.0f, 1.0f, -6.0f), 1.0f,
-                                               Material(Color::WHITE, 1000.0f, true))};
-    scene.addShape(mirrorSphere);
-
-    LightRack lightRack;
-    const AmbientLight ambient{Color(0.5f)};
-    lightRack.addLight(ambient);
-    const PointLight light{Point3(3.0f, 5.5f, 0.0f), Color(0.4f)};
-    lightRack.addLight(light);
-    const PointLight light2{Point3(-3.0f, 5.5f, 0.0f), Color(0.4f)};
-    lightRack.addLight(light2);
-
-    constexpr int width{1280};
-    constexpr int height{720};
-
-    PerspectiveCamera camera{Point3(0.0f, 4.0f, 0.0f), Vector3(0.0f, 0.0f, -10.0f),
-                             Vector3(0.0f, 1.0f, 0.0f), Math::PI / 8,
-                             static_cast<float>(width) / static_cast<float>(height)};
-
-    Renderer renderer{scene, lightRack, width, height};
-
-    auto render = renderer.rayTrace(camera, 2, 200);
-    renderer.saveRender(render, "scene.ppm");
+    auto render = rayTrace(camera, scene, params);
+    saveRenderToPPM(render, "scene.ppm");
 
     return 0;
 }

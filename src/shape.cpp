@@ -2,36 +2,12 @@
 #include <memory>
 #include <optional>
 
+#include "intersection.hpp"
 #include "ray.hpp"
 #include "shape.hpp"
 #include "utils.hpp"
 
-// CLASS SCENE
-
-Scene::Scene() = default;
-
-void Scene::addShape(std::shared_ptr<Shape> shape) { shapes.push_back(shape); }
-
-std::optional<Intersection> Scene::intersect(const Ray& ray) const {
-    std::optional<Intersection> closestIntersection;
-
-    for (const auto pShape : shapes) {
-        auto intersection = pShape->intersect(ray);
-        if (!closestIntersection ||
-            (intersection &&
-             intersection->distanceToRayOrigin < closestIntersection->distanceToRayOrigin)) {
-            closestIntersection = intersection;
-        }
-    }
-
-    return closestIntersection;
-}
-
-// CLASS SHAPE
-
 Shape::Shape(const Material& material) : material(material) {}
-
-// CLASS PLANE
 
 Plane::Plane(const Point3& position, const Vector3& normal, const Material& material)
     : Shape(material), position(position), normal(normal) {}
