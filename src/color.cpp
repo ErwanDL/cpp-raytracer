@@ -28,6 +28,6 @@ Color& Color::operator/=(float f) {
 }
 
 bool Color::operator==(const Color& other) const {
-    return Math::floatingPointEquality(r, other.r) && Math::floatingPointEquality(g, other.g) &&
-           Math::floatingPointEquality(b, other.b);
+    return Utils::floatingPointEquality(r, other.r) && Utils::floatingPointEquality(g, other.g) &&
+           Utils::floatingPointEquality(b, other.b);
 }

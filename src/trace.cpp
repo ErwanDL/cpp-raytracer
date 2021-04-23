@@ -1,7 +1,6 @@
 #include "trace.hpp"
 #include "camera.hpp"
 #include "ray.hpp"
-#include "sampling.hpp"
 #include "scene.hpp"
 #include "utils.hpp"
 #include <chrono>
@@ -21,43 +20,10 @@ void displayProgress(float progressRatio) {
               << '%' << std::flush;
 }
 
-Color shootRayRecursively(const Ray& ray, const Scene& scene, int nBounces, int nSamples) {
-    const auto intersection = scene.findFirstIntersection(ray);
-    if (!intersection) {
-        std::cout << nBounces << std::endl;
-        return scene.skyColor;
-    }
-    Color intersectionColor = scene.computeTotalLighting(intersection.value(), ray.origin);
-    const Material& material = intersection->material;
-
-    if (nBounces == 0 || !material.metal) {
-        return intersectionColor;
-    }
-
-    const Vector3 perfectReflectionDirection = ray.direction.reflected(intersection->normal);
-
-    Color reflectedColor{0.0f};
-    for (int i = 0; i < nSamples; ++i) {
-        Vector3 sampledDirection =
-            sampleHemisphere(perfectReflectionDirection, material.smoothness);
-        // Reflected rays that would shoot beneath the surface are reflected about the
-        // perfect reflection direction, back above the surface
-        if (sampledDirection.dot(intersection->normal) < 0.0f) {
-            sampledDirection = (-sampledDirection).reflected(perfectReflectionDirection);
-        }
-        const Ray reflectedRay{intersection->location, sampledDirection};
-        reflectedColor += shootRayRecursively(reflectedRay, scene, nBounces - 1, nSamples);
-    }
-    reflectedColor /= nSamples;
-
-    return intersectionColor +
-           reflectedColor * (material.metal ? material.albedo : material.specularity);
-}
-
 Color gammaCorrect(const Color& color, float gamma) {
-    return Color(Math::clamp(std::pow(color.r, 1.0f / gamma)),
-                 Math::clamp(std::pow(color.g, 1.0f / gamma)),
-                 Math::clamp(std::pow(color.b, 1.0f / gamma)));
+    return Color(Utils::clamp(std::pow(color.r, 1.0f / gamma)),
+                 Utils::clamp(std::pow(color.g, 1.0f / gamma)),
+                 Utils::clamp(std::pow(color.b, 1.0f / gamma)));
 }
 
 std::vector<std::vector<Color>> rayTrace(const PerspectiveCamera& camera, const Scene& scene,
@@ -71,9 +37,13 @@ std::vector<std::vector<Color>> rayTrace(const PerspectiveCamera& camera, const 
         std::vector<Color> line;
         displayProgress(static_cast<float>(y) / static_cast<float>(params.height));
         for (int x = 0; x < params.width; ++x) {
-            Ray initialRay = camera.makeRay(x, y, params.width, params.height);
-            auto color = shootRayRecursively(initialRay, scene, params.nBounces, params.nSamples);
-            line.push_back(gammaCorrect(color, params.gamma));
+            Color pixelColor{0.0f};
+            for (int i = 0; i < params.nSamples; ++i) {
+                Ray initialRay = camera.makeRay(static_cast<float>(x), static_cast<float>(y),
+                                                params.width, params.height);
+                pixelColor += scene.shootRay(initialRay, params.maxBounces);
+            }
+            line.push_back(gammaCorrect(pixelColor / params.nSamples, params.gamma));
         }
         render.push_back(line);
     }

@@ -50,6 +50,7 @@ Color PointLight::computeDiffuse(float lightDotN, const Material& material) cons
 }
 
 Color PointLight::computeSpecular(float observerDotReflected, const Material& material) const {
-    return std::pow(observerDotReflected, std::min(material.smoothness, 500.0f)) * color *
+    float clampedSmoothness = std::min(material.smoothness, 500.0f);
+    return std::pow(observerDotReflected, clampedSmoothness) * color *
            (material.metal ? material.albedo : material.specularity);
 }

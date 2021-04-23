@@ -31,8 +31,8 @@ Vector3& Vector3::operator/=(float f) {
 Vector3 Vector3::operator-() const { return Vector3(-x, -y, -z); }
 
 bool Vector3::operator==(const Vector3& other) const {
-    return Math::floatingPointEquality(x, other.x) && Math::floatingPointEquality(y, other.y) &&
-           Math::floatingPointEquality(z, other.z);
+    return Utils::floatingPointEquality(x, other.x) && Utils::floatingPointEquality(y, other.y) &&
+           Utils::floatingPointEquality(z, other.z);
 }
 
 Vector3 operator+(const Vector3& v1, const Vector3& v2) {
@@ -45,7 +45,7 @@ Vector3 operator*(const Vector3& v, float f) { return Vector3(v.x * f, v.y * f, 
 Vector3 operator*(float f, const Vector3& v) { return Vector3(v.x * f, v.y * f, v.z * f); }
 Vector3 operator/(const Vector3& v, float f) { return Vector3(v.x / f, v.y / f, v.z / f); }
 
-float Vector3::lengthSquared() const { return Math::sqr(x) + Math::sqr(y) + Math::sqr(z); }
+float Vector3::lengthSquared() const { return Utils::sqr(x) + Utils::sqr(y) + Utils::sqr(z); }
 
 float Vector3::length() const { return std::sqrt(lengthSquared()); }
 

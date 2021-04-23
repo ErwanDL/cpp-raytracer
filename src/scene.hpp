@@ -19,32 +19,18 @@ class Scene {
 
     Scene(const std::vector<std::shared_ptr<Shape>>& shapes,
           const std::vector<std::shared_ptr<Light>>& lights,
-          const Color& skyColor = Color(0.5f, 0.8f, 0.9f))
+          const Color& skyColor = Color(0.7f, 0.9f, 1.0f))
         : shapes(shapes), lights(lights), skyColor(skyColor) {}
 
-    std::optional<Intersection> findFirstIntersection(const Ray& ray) const {
-        std::optional<Intersection> closestIntersection;
+    Color shootRay(const Ray& ray, int nBounces) const;
+    std::optional<Intersection> findFirstIntersection(const Ray& ray) const;
 
-        for (const auto& shape : shapes) {
-            auto intersection = shape->intersect(ray);
-            if (intersection &&
-                (!closestIntersection ||
-                 intersection->distanceToRayOrigin < closestIntersection->distanceToRayOrigin)) {
-                closestIntersection = intersection;
-            }
-        }
+  private:
+    Color computeDirectLighting(const Intersection& intersection,
+                                const Point3& observerLocation) const;
 
-        return closestIntersection;
-    }
-
-    Color computeTotalLighting(const Intersection& intersection,
-                               const Point3& observerLocation) const {
-        Color intersectionColor{0.0f};
-        for (const auto& light : lights) {
-            intersectionColor += light->illuminate(intersection, *this, observerLocation);
-        }
-        return intersectionColor;
-    }
+    Color computeIndirectLighting(const Intersection& intersection, const Point3& observerLocation,
+                                  int nBounces) const;
 };
 
 #endif

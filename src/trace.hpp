@@ -9,12 +9,12 @@
 struct RenderParams {
     int width;
     int height;
-    int nBounces;
+    int maxBounces;
     int nSamples;
     float gamma;
 
-    RenderParams(int width, int height, int nBounces, int nSamples, float gamma = 2.2f)
-        : width(width), height(height), nBounces(nBounces), nSamples(nSamples), gamma(gamma) {}
+    RenderParams(int width, int height, int maxBounces, int nSamples, float gamma = 2.2f)
+        : width(width), height(height), maxBounces(maxBounces), nSamples(nSamples), gamma(gamma) {}
 };
 
 std::vector<std::vector<Color>> rayTrace(const PerspectiveCamera& camera, const Scene& scene,

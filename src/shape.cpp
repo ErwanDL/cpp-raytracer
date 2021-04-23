@@ -27,9 +27,9 @@ std::optional<Intersection> Sphere::intersect(const Ray& ray) const {
     // float a = raydirection.lengthSquared() is always equal to 1
     float a = 1.0f;
     float b = 2 * ray.direction.dot(ray.origin - centre);
-    float c = (ray.origin - centre).lengthSquared() - Math::sqr(radius);
+    float c = (ray.origin - centre).lengthSquared() - Utils::sqr(radius);
 
-    auto solutions = Math::solveSecondDegreeEquation(a, b, c);
+    auto solutions = Utils::solveSecondDegreeEquation(a, b, c);
 
     if (!solutions) {
         return {};

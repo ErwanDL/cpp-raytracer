@@ -19,9 +19,9 @@ class PerspectiveCamera {
           right(forward.cross(Vector3(0.0f, 1.0f, 0.0f)).normalized()), up(right.cross(forward)),
           maxV(std::tan(vfov / 2)) {}
 
-    Ray makeRay(int x, int y, int width, int height) const {
-        float u = 2.0f * (static_cast<float>(x) - static_cast<float>(width) / 2.0f) / height;
-        float v = 2.0f * (static_cast<float>(height) / 2.0f - static_cast<float>(y)) / height;
+    Ray makeRay(float x, float y, int width, int height) const {
+        float u = 2.0f * (x - static_cast<float>(width) / 2.0f) / height;
+        float v = 2.0f * (static_cast<float>(height) / 2.0f - y) / height;
         Vector3 direction{forward + u * maxV * right + v * up * maxV};
         return Ray(location, direction);
     }

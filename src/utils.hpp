@@ -7,7 +7,7 @@
 #include <random>
 #include <utility>
 
-namespace Math {
+namespace Utils {
 template <typename T> T sqr(T x) { return x * x; }
 constexpr float PI{3.141592f};
 
@@ -42,7 +42,7 @@ inline float clamp(float x, float min = 0.0f, float max = 1.0f) { return std::cl
  * t1 <= t2 else.
  */
 inline std::optional<std::pair<float, float>> solveSecondDegreeEquation(float a, float b, float c) {
-    float discriminant{Math::sqr(b) - 4 * a * c};
+    float discriminant{Utils::sqr(b) - 4 * a * c};
 
     if (discriminant < 0.0f) {
         return {};
@@ -52,6 +52,6 @@ inline std::optional<std::pair<float, float>> solveSecondDegreeEquation(float a,
     float t2{(-b + std::sqrt(discriminant)) / (2 * a)};
     return std::make_pair(t1, t2);
 }
-} // namespace Math
+} // namespace Utils
 
 #endif
