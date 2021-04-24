@@ -17,11 +17,13 @@ file(GLOB SRC_FILES
     "src/*.cpp"
 )
 
+
 list(REMOVE_ITEM SRC_FILES "${CMAKE_SOURCE_DIR}/src/main.cpp" "${CMAKE_SOURCE_DIR}/src/test.cpp")
 
 find_package(OpenMP REQUIRED)
+include_directories(lodepng)
 
-add_executable(raytracer ${SRC_FILES} src/main.cpp)
+add_executable(raytracer ${SRC_FILES} lodepng/lodepng.cpp src/main.cpp)
 
 target_link_libraries(raytracer PRIVATE OpenMP::OpenMP_CXX)
 

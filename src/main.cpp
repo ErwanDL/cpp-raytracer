@@ -50,7 +50,7 @@ int main() {
     PerspectiveCamera camera{Point3(0.0f, 3.0f, 0.0f), Point3(0.0f, 0.5f, -7.0f), Utils::PI / 4};
 
     auto render = rayTrace(camera, scene, params);
-    saveRenderToPPM(render, "scene.ppm");
+    saveRenderToPNG(render, "scene.png");
 
     return 0;
 }

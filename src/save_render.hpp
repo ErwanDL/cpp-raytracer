@@ -3,26 +3,27 @@
 
 #include "material.hpp"
 #include <fstream>
+#include <lodepng.h>
 #include <string>
 #include <vector>
 
-int to8Bit(float f) { return static_cast<int>(std::round(f * 255)); }
+unsigned char to8Bit(float f) { return static_cast<unsigned char>(std::round(f * 255)); }
 
-void saveRenderToPPM(const std::vector<std::vector<Color>>& render, const std::string& filename) {
-    std::ofstream outfile{filename};
+void saveRenderToPNG(const std::vector<std::vector<Color>>& render, const std::string& filename) {
     int width = render[0].size();
     int height = render.size();
 
-    outfile << "P3" << '\n';
-    outfile << width << ' ' << height << '\n';
-    outfile << 255 << '\n';
+    std::vector<unsigned char> img(width * height * 3);
 
-    for (const auto& line : render) {
-        for (const Color& pixel : line) {
-            outfile << to8Bit(pixel.r) << ' ' << to8Bit(pixel.g) << ' ' << to8Bit(pixel.b) << ' ';
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            int idx = 3 * (width * y + x);
+            img[idx] = to8Bit(render[y][x].r);
+            img[idx + 1] = to8Bit(render[y][x].g);
+            img[idx + 2] = to8Bit(render[y][x].b);
         }
     }
 
-    outfile.close();
+    lodepng::encode(filename, img, width, height, LCT_RGB);
 }
 #endif
