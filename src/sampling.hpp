@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include "vector3.hpp"
 #include <cmath>
+#include <utility>
 
 /* The exponent is applied to the cosine of the polar angle. */
 inline Vector3 sampleHemisphereDirection(const Vector3& zenithDirection, float exponent) {
@@ -31,5 +32,9 @@ inline Point3 sampleSpherePoint(const Point3& center, float radius) {
     } while (x * x + y * y + z * z > 1.0f);
 
     return Point3(center.x + radius * x, center.y + radius * y, center.z + radius * z);
+}
+
+inline std::pair<float, float> samplePixel(int x, int y) {
+    return {x + Utils::random() - 0.5f, y + Utils::random() - 0.5f};
 }
 #endif

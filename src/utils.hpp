@@ -25,7 +25,7 @@ inline float random() {
     thread_local std::mt19937 generator{std::random_device{}()};
     thread_local std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
     return distribution(generator);
-    // This may be slightly faster
+    // This may be slightly faster (less "crypto-secure" but we're raytracing anyways)
     // return static_cast<float>generator() / generator.max();
 
     // Old C-style version (fast when monothreaded, but synchronization issues with OpenMP) :
