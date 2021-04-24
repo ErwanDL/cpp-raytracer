@@ -13,9 +13,23 @@ constexpr float PI{3.141592f};
 
 /* Returns a random float uniformly between 0.0f and 1.0f. */
 inline float random() {
-    static std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
-    static std::mt19937 generator;
+    /* Interesting discoveries here : while far from a perfect PRNG, the C-style
+    rand() function yielded very significant performance improvements over the C++
+    std::mt19937 implementation (15-20% on final render time). However, when
+    implementing multithreading using OpenMP, rand() hurts catastrophically the
+    performance, resulting in close to no improvement over the monothreaded version.
+    Explanation for the slowness of rand() in multithreaded context :
+    https://stackoverflow.com/questions/10624755/openmp-program-is-slower-than-sequential-one */
+
+    // Modern C++ version :
+    thread_local std::mt19937 generator{std::random_device{}()};
+    thread_local std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
     return distribution(generator);
+    // This may be slightly faster
+    // return static_cast<float>generator() / generator.max();
+
+    // Old C-style version (fast when monothreaded, but synchronization issues with OpenMP) :
+    // return static_cast<float>(rand()) / RAND_MAX;
 }
 
 inline float signBitToNumber(bool signBit) { return signBit ? 1.0f : -1.0f; }

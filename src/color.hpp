@@ -11,6 +11,7 @@ struct Color {
     static Color WHITE;
     static Color BLACK;
 
+    Color() : r(0.0f), g(0.0f), b(0.0f) {}
     Color(float f) : r(f), g(f), b(f) {}
     Color(float red, float green, float blue) : r(red), g(green), b(blue) {}
 

@@ -1,15 +1,12 @@
 # Raytracing in C++
 
-This is a personal project in which I build a raytracer with incremental features, that I started to learn modern C++ and computer graphics !
+This is a personal project in which I incrementally build a raytracer, that I started to learn modern C++ and computer graphics. Going back at it from time to time !
 
 ![Example image](./scene.png)
 
 ## Running the project
 
--   You need to have CMake and Make installed, as well as a C++ compiler (I mainly use Clang to develop this project, I cannot assert that it works flawlessly with GCC/MSVC).
-
--   To run the tests, you need to have the [Catch2](https://github.com/catchorg/Catch2) header-only library in your compiler's include path.
-
+-   Requirements : CMake, Make, a modern C++ compiler (tested with G++ >= 9), OpenMP library (for multithreading).
 -   Generate the Makefile by doing :
     ```bash
     $ mkdir build
@@ -21,30 +18,12 @@ This is a personal project in which I build a raytracer with incremental feature
     $ make raytracer
     $ ./raytracer
     ```
-    or run the tests with :
-    ```bash
-    $ make runtests
-    $ ./runtests
-    ```
 
 If you want to change the rendered scene, you can do so in `src/main.cpp`.
 
-## Features developed
+## Features supported
 
--   [x] Ambient lighting
--   [x] Point Lights
--   [x] Basic diffuse shading
--   [x] Cast shadows
--   [x] Specular highlights (Phong illumination model)
--   [x] Perfect reflections
--   [x] Progress bar
--   [x] Glossy reflections
--   [ ] Texture mapping
--   [ ] Normal mapping
--   [ ] Area lights
--   [ ] Ambient occlusion
--   [ ] Adaptive supersampling
--   [ ] Glass material
--   [ ] Bloom
--   [ ] Multi-threaded implementation
--   [ ] Environment mapping
+-   [x] Global illumination (path tracing, but also using direct light sampling)
+-   [x] Soft shadows (non-ponctual lights)
+-   [x] Single PBR Material (inspired by Disney's & Blender's Principled BSDF although much less complete)
+-   [x] Multithreading (using OpenMP)
