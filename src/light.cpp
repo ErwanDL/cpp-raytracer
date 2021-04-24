@@ -1,5 +1,6 @@
 #include "light.hpp"
 #include "ray.hpp"
+#include "sampling.hpp"
 #include "scene.hpp"
 #include "shape.hpp"
 #include "trace.hpp"
@@ -13,9 +14,12 @@ Color AmbientLight::illuminate(const Intersection& intersection, const Scene&,
     return intersection.material.get().albedo * color;
 }
 
-Color PointLight::illuminate(const Intersection& intersection, const Scene& scene,
-                             const Point3& observerLocation) const {
-    const Vector3 fromLight = (intersection.location - origin).normalized();
+Color SphereLight::illuminate(const Intersection& intersection, const Scene& scene,
+                              const Point3& observerLocation) const {
+    // Sampling the whole sphere volume for now.
+    // May want to switch to sampling only the visible sphere surface later.
+    Point3 sampledPoint = sampleSpherePoint(origin, radius);
+    const Vector3 fromLight = (intersection.location - sampledPoint).normalized();
     const float lightDotN = -fromLight.dot(intersection.normal);
 
     if (lightDotN <= 0.0f) {
@@ -25,7 +29,7 @@ Color PointLight::illuminate(const Intersection& intersection, const Scene& scen
     // checking if a shape is between the intersection and the light,
     // in which case a shadow is cast
     Ray rayTowardsLight{intersection.location, -fromLight,
-                        (origin - intersection.location).length()};
+                        (sampledPoint - intersection.location).length()};
     const auto shadowIntersection = scene.findFirstIntersection(rayTowardsLight);
 
     if (shadowIntersection) {
@@ -45,11 +49,11 @@ Color PointLight::illuminate(const Intersection& intersection, const Scene& scen
     return diffuseColor + specularColor;
 }
 
-Color PointLight::computeDiffuse(float lightDotN, const Material& material) const {
+Color SphereLight::computeDiffuse(float lightDotN, const Material& material) const {
     return material.metal ? Color::BLACK : lightDotN * color * material.albedo;
 }
 
-Color PointLight::computeSpecular(float observerDotReflected, const Material& material) const {
+Color SphereLight::computeSpecular(float observerDotReflected, const Material& material) const {
     float clampedSmoothness = std::min(material.smoothness, 500.0f);
     return std::pow(observerDotReflected, clampedSmoothness) * color *
            (material.metal ? material.albedo : material.specularity);

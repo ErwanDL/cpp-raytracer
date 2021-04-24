@@ -25,12 +25,14 @@ class AmbientLight : public Light {
                      const Point3& observerLocation) const override;
 };
 
-class PointLight : public Light {
+class SphereLight : public Light {
     Point3 origin;
     Color color;
+    float radius;
 
   public:
-    PointLight(const Point3& origin, const Color& color) : origin(origin), color(color) {}
+    SphereLight(const Point3& origin, const Color& color, float radius)
+        : origin(origin), color(color), radius(radius) {}
 
     Color illuminate(const Intersection& intersection, const Scene& scene,
                      const Point3& observerLocation) const override;
