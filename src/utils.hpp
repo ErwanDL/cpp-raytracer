@@ -9,7 +9,8 @@
 
 namespace Utils {
 template <typename T> T sqr(T x) { return x * x; }
-constexpr float PI{3.141592f};
+constexpr float PI = 3.141592f;
+constexpr float TWO_PI = 2.0f * PI;
 
 /* Returns a random float uniformly between 0.0f and 1.0f. */
 inline float random() {

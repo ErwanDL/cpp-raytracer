@@ -3,6 +3,8 @@
 Color Color::WHITE = Color(1.0f);
 Color Color::BLACK = Color(0.0f);
 
+Color Color::clamped() const { return Color(Utils::clamp(r), Utils::clamp(g), Utils::clamp(b)); }
+
 Color operator*(const Color& c1, const Color& c2) {
     return Color(c1.r * c2.r, c1.g * c2.g, c1.b * c2.b);
 }

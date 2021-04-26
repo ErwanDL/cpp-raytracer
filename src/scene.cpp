@@ -1,28 +1,43 @@
 #include "scene.hpp"
-#include "sampling.hpp"
+#include "ray.hpp"
+#include "sampling_utils.hpp"
 #include "trace.hpp"
+#include <cmath>
 
-Color Scene::shootRay(const Ray& ray, int nBounces) const {
-    const auto intersection = findFirstIntersection(ray);
-    if (!intersection) {
+Color Scene::shootRay(const Ray& ray, int remainingBounces, bool isCameraRay) const {
+    const auto optIntersection = findFirstIntersection(ray);
+
+    if (!optIntersection) {
         return skyColor;
     }
-    Color direct = computeDirectLighting(intersection.value(), ray.origin);
 
-    if (nBounces == 0) {
+    const Intersection& intersection = optIntersection.value();
+    const Material& material = intersection.material.get();
+
+    if (material.emission > 0.0f) { // If hit object is a light
+        // If camera ray : clamp value (to prevent aliasing) and terminate path.
+        if (isCameraRay) {
+            return (material.color * material.emission).clamped();
+        }
+        // With NEE activated, we want to avoid counting direct diffuse lighting twice.
+        return (ray.isSpecular || !params.nextEventEstimation) * material.color * material.emission;
+    }
+
+    Color direct =
+        params.nextEventEstimation ? computeDirectDiffuseLighting(intersection) : Color::BLACK;
+
+    if (remainingBounces == 0) {
         return direct;
     }
 
-    Color indirect = computeIndirectLighting(intersection.value(), ray.origin, nBounces - 1);
-
-    return direct + indirect;
+    return direct + computeIndirectLighting(intersection, ray.origin, remainingBounces - 1);
 }
 
 std::optional<Intersection> Scene::findFirstIntersection(const Ray& ray) const {
     std::optional<Intersection> closestIntersection;
 
-    for (const auto& shape : shapes) {
-        auto intersection = shape->intersect(ray);
+    for (const auto& intersectable : intersectables) {
+        auto intersection = intersectable->intersect(ray);
         if (intersection &&
             (!closestIntersection ||
              intersection->distanceToRayOrigin < closestIntersection->distanceToRayOrigin)) {
@@ -33,17 +48,40 @@ std::optional<Intersection> Scene::findFirstIntersection(const Ray& ray) const {
     return closestIntersection;
 }
 
-Color Scene::computeDirectLighting(const Intersection& intersection,
-                                   const Point3& observerLocation) const {
+Color Scene::computeDirectDiffuseLighting(const Intersection& intersection) const {
     Color intersectionColor{0.0f};
+
+    // Metals have no diffuse component.
+    if (intersection.material.get().metal) {
+        return intersectionColor;
+    }
+
     for (const auto& light : lights) {
-        intersectionColor += light->illuminate(intersection, *this, observerLocation);
+        Point3 sampledPoint = light->sampleSolidAngle(intersection.location);
+        Vector3 fromLight = (intersection.location - sampledPoint).normalized();
+        float lightDotN = -fromLight.dot(intersection.normal);
+
+        if (lightDotN <= 0.0f) {
+            continue;
+        }
+
+        // Checking for occlusion between the intersection and light
+        Ray rayTowardsLight{intersection.location, -fromLight};
+        rayTowardsLight.maxDist = (sampledPoint - intersection.location).length() -
+                                  Ray::MIN_RAY_DIST; // preventing auto-occlusion
+
+        if (findFirstIntersection(rayTowardsLight)) {
+            continue;
+        }
+
+        intersectionColor += lightDotN * intersection.material.get().color *
+                             light->computeDirectDiffuse(intersection.location, sampledPoint);
     }
     return intersectionColor;
 }
 
 Color Scene::computeIndirectLighting(const Intersection& intersection,
-                                     const Point3& observerLocation, int nBounces) const {
+                                     const Point3& observerLocation, int remainingBounces) const {
     const Material& material = intersection.material;
 
     if (material.metal || Utils::random() <= material.specularity) {
@@ -51,23 +89,23 @@ Color Scene::computeIndirectLighting(const Intersection& intersection,
         Vector3 perfectReflectionDirection =
             (intersection.location - observerLocation).normalized().reflected(intersection.normal);
 
-        Vector3 sampledDirection =
-            sampleHemisphereDirection(perfectReflectionDirection, 1.0f / material.smoothness);
+        Vector3 sampledDirection = Utils::sampleHemisphereDirection(perfectReflectionDirection,
+                                                                    1.0f / material.smoothness);
         // Reflected rays that would shoot beneath the surface are reflected about the
         // perfect reflection direction, back above the surface
         if (sampledDirection.dot(intersection.normal) < 0.0f) {
             sampledDirection = (-sampledDirection).reflected(perfectReflectionDirection);
         }
-        Ray reflectedRay{intersection.location, sampledDirection};
-        Color incomingLight = shootRay(reflectedRay, nBounces);
+        Ray reflectedRay{intersection.location, sampledDirection, true};
+        Color incomingLight = shootRay(reflectedRay, remainingBounces);
 
-        return incomingLight * (material.metal ? material.albedo : 1.0f);
+        return incomingLight * (material.metal ? material.color : 1.0f);
     } else {
         // refract the ray : diffuse
-        Vector3 sampledDirection = sampleHemisphereDirection(intersection.normal, 1.0f);
+        Vector3 sampledDirection = Utils::sampleHemisphereDirection(intersection.normal, 1.0f);
         Ray refractedRay{intersection.location, sampledDirection};
-        Color incomingLight = shootRay(refractedRay, nBounces);
+        Color incomingLight = shootRay(refractedRay, remainingBounces);
 
-        return incomingLight * material.albedo;
+        return incomingLight * material.color;
     }
 }

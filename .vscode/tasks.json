@@ -22,13 +22,10 @@
             }
         },
         {
-            "label": "Build & Run test file",
+            "label": "Build test",
             "type": "shell",
-            "command": "cd build && make test && ./test",
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            }
+            "command": "cd build && make test",
+            "group": "test"
         }
     ]
 }

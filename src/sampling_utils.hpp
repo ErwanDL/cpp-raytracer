@@ -6,18 +6,27 @@
 #include <cmath>
 #include <utility>
 
-/* The exponent is applied to the cosine of the polar angle. */
-inline Vector3 sampleHemisphereDirection(const Vector3& zenithDirection, float exponent) {
+namespace Utils {
+/* Returns the given normalized vector rotated by polar angle theta and azimuth phi in its local
+spherical coordinate system. The reference for the azimuth is chosen at random, as all my sampling
+needs are isotropical for now. */
+inline Vector3 sphericalCoordsRotation(const Vector3& zenithDirection, float theta, float phi) {
     // One of the many ways to get an orthogonal basis from the zenith direction.
     auto u = Vector3(-zenithDirection.y, zenithDirection.x, 0.0f).normalized();
     auto v = zenithDirection.cross(u);
+    float sinTheta = std::sin(theta);
+
+    return std::cos(theta) * zenithDirection + sinTheta * std::cos(phi) * u +
+           sinTheta * std::sin(phi) * v;
+}
+
+/* The exponent is applied to the cosine of the polar angle. */
+inline Vector3 sampleHemisphereDirection(const Vector3& zenithDirection, float exponent) {
 
     float theta = std::acos(std::pow(Utils::random(), exponent));
-    float phi =
-        2.0f * Utils::PI * Utils::random(); // azimuth, with u as the reference for 0 azimuth
+    float phi = Utils::TWO_PI * Utils::random();
 
-    return std::cos(theta) * zenithDirection + std::sin(theta) * std::cos(phi) * u +
-           std::sin(theta) * std::sin(phi) * v;
+    return sphericalCoordsRotation(zenithDirection, theta, phi);
 }
 
 inline Point3 sampleSpherePoint(const Point3& center, float radius) {
@@ -37,4 +46,6 @@ inline Point3 sampleSpherePoint(const Point3& center, float radius) {
 inline std::pair<float, float> samplePixel(int x, int y) {
     return {x + Utils::random() - 0.5f, y + Utils::random() - 0.5f};
 }
+} // namespace Utils
+
 #endif

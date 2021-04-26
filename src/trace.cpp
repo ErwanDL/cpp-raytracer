@@ -1,7 +1,8 @@
 #include "trace.hpp"
 #include "camera.hpp"
+#include "params.hpp"
 #include "ray.hpp"
-#include "sampling.hpp"
+#include "sampling_utils.hpp"
 #include "scene.hpp"
 #include "utils.hpp"
 #include <chrono>
@@ -25,9 +26,9 @@ std::string progressBar(float progressRatio) {
 }
 
 Color gammaCorrect(const Color& color, float gamma) {
-    return Color(Utils::clamp(std::pow(color.r, 1.0f / gamma)),
-                 Utils::clamp(std::pow(color.g, 1.0f / gamma)),
-                 Utils::clamp(std::pow(color.b, 1.0f / gamma)));
+    float exponent = 1.0f / gamma;
+    return Color(std::pow(color.r, exponent), std::pow(color.g, exponent),
+                 std::pow(color.b, exponent));
 }
 
 std::vector<std::vector<Color>> rayTrace(const PerspectiveCamera& camera, const Scene& scene,
@@ -52,12 +53,13 @@ std::vector<std::vector<Color>> rayTrace(const PerspectiveCamera& camera, const 
         for (int x = 0; x < params.width; ++x) {
             Color pixelColor{0.0f};
             for (int i = 0; i < params.nSamples; ++i) {
-                auto sampledPixel = samplePixel(x, y); // to prevent aliasing
+                auto sampledPixel = Utils::samplePixel(x, y); // to prevent aliasing
                 Ray initialRay = camera.makeRay(sampledPixel.first, sampledPixel.second,
                                                 params.width, params.height);
-                pixelColor += scene.shootRay(initialRay, params.maxBounces);
+                pixelColor += scene.shootRay(initialRay, params.maxBounces, true);
             }
-            line[x] = gammaCorrect(pixelColor / params.nSamples, params.gamma);
+            pixelColor /= params.nSamples;
+            line[x] = gammaCorrect((pixelColor).clamped(), params.gamma);
         }
         render[y] = line;
     }
