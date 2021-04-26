@@ -104,7 +104,7 @@ Color Scene::computeIndirectLighting(const Intersection& intersection,
         return incomingLight * (material.metal ? material.color : 1.0f);
     } else {
         // refract the ray : diffuse
-        Vector3 sampledDirection = Utils::sampleHemisphereDirection(intersection.normal, 1.0f);
+        Vector3 sampledDirection = Utils::sampleHemisphereCosineWeighted(intersection.normal);
         Ray refractedRay{intersection.location, sampledDirection};
         Color incomingLight = shootRay(refractedRay, remainingBounces);
 
