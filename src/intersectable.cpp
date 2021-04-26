@@ -29,7 +29,7 @@ Color Plane::computeDirectDiffuse(const Point3&, const Point3&) const {
     return Color::BLACK;
 }
 
-Point3 Plane::sampleSolidAngle(const Point3&) const {
+Point3 Plane::sampleVisibleSurface(const Point3&) const {
     assert(false && "Not implemented yet");
     return Point3(0.0f, 0.0f, 0.0f);
 }
@@ -62,27 +62,25 @@ std::optional<Intersection> Sphere::intersect(const Ray& ray) const {
 }
 
 Color Sphere::computeDirectDiffuse(const Point3& location, const Point3& sampledPoint) const {
-    float cosThetaMax = (sampledPoint - location).length() / (center - location).length();
-    // Solid angle of the cone from location to the sphere
-    float normalization = 1.0f - cosThetaMax;
-    return material.emission * material.color * normalization;
+    Vector3 pointToLocation = location - sampledPoint;
+    Vector3 normal = (sampledPoint - center).normalized();
+    float cosThetaMax = radius / (center - location).length();
+
+    float pdf = 1.0f / (Utils::TWO_PI * (1.0f - cosThetaMax) * Utils::sqr(radius));
+    return normal.dot(pointToLocation.normalized()) * material.emission * material.color /
+           (pdf * pointToLocation.lengthSquared());
 }
 
-Point3 Sphere::sampleSolidAngle(const Point3& location) const {
-    float d = (center - location).length();
-    float sinThetaMax = radius / d;
+Point3 Sphere::sampleVisibleSurface(const Point3& viewer) const {
+    float dToCenter = (center - viewer).length();
+    float cosThetaMax = radius / dToCenter;
+
     float phi = Utils::TWO_PI * Utils::random();
-    float cosThetaMax = std::sqrt(1 - Utils::sqr(sinThetaMax));
-
-    // Sampling theta : not just random() * sinThetaMax like I thought before !
+    // Uniform sampling of the visible portion of the hemisphere, delimited by angle thetaMax
     float theta = std::acos(1 - Utils::random() * (1 - cosThetaMax));
-    Vector3 directionToSample =
-        Utils::sphericalCoordsRotation((center - location).normalized(), theta, phi);
 
-    // Using Al-Kashi's theorem, and clamping x's value beforehand to avoid floating point
-    // errors resulting in the square root returning NaN
-    float x = Utils::sqr(radius) - Utils::sqr(std::sin(theta) * d);
-    float distToSample = d * std::cos(theta) - std::sqrt(std::max(0.0f, x));
+    Vector3 sampledDirection =
+        Utils::sphericalCoordsRotation((viewer - center).normalized(), theta, phi);
 
-    return location + distToSample * directionToSample;
+    return center + radius * sampledDirection;
 }

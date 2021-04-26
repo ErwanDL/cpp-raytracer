@@ -19,7 +19,7 @@ class Intersectable {
     virtual std::optional<Intersection> intersect(const Ray& ray) const = 0;
     virtual Color computeDirectDiffuse(const Point3& location,
                                        const Point3& sampledPoint) const = 0;
-    virtual Point3 sampleSolidAngle(const Point3& location) const = 0;
+    virtual Point3 sampleVisibleSurface(const Point3& viewer) const = 0;
 };
 
 class Plane : public Intersectable {
@@ -32,8 +32,8 @@ class Plane : public Intersectable {
         : Intersectable(material), position(position), normal(normal) {}
 
     std::optional<Intersection> intersect(const Ray& ray) const override;
-    Color computeDirectDiffuse(const Point3& observer, const Point3& sampledPoint) const override;
-    Point3 sampleSolidAngle(const Point3& observer) const override;
+    Color computeDirectDiffuse(const Point3& location, const Point3& sampledPoint) const override;
+    Point3 sampleVisibleSurface(const Point3& viewer) const override;
 };
 
 class Sphere : public Intersectable {
@@ -46,8 +46,8 @@ class Sphere : public Intersectable {
         : Intersectable(material), center(center), radius(radius) {}
 
     std::optional<Intersection> intersect(const Ray& ray) const override;
-    Color computeDirectDiffuse(const Point3& observer, const Point3& sampledPoint) const override;
-    Point3 sampleSolidAngle(const Point3& observer) const override;
+    Color computeDirectDiffuse(const Point3& location, const Point3& sampledPoint) const override;
+    Point3 sampleVisibleSurface(const Point3& viewer) const override;
 };
 
 #endif

@@ -46,7 +46,7 @@ int main() {
                                  Material::Emissive(Color::WHITE, 3.0f)),
     };
 
-    RenderParams params{720, 405, 2, 40, true};
+    RenderParams params{720, 405, 2, 20, true};
 
     Scene scene{shapes, lights, params, Color(0.02f, 0.05f, 0.1f)};
 

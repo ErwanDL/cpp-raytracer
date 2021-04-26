@@ -50,23 +50,24 @@ std::optional<Intersection> Scene::findFirstIntersection(const Ray& ray) const {
 
 Color Scene::computeDirectDiffuseLighting(const Intersection& intersection) const {
     Color intersectionColor{0.0f};
+    const Material& material = intersection.material.get();
 
     // Metals have no diffuse component.
-    if (intersection.material.get().metal) {
+    if (material.metal) {
         return intersectionColor;
     }
 
     for (const auto& light : lights) {
-        Point3 sampledPoint = light->sampleSolidAngle(intersection.location);
-        Vector3 fromLight = (intersection.location - sampledPoint).normalized();
-        float lightDotN = -fromLight.dot(intersection.normal);
+        Point3 sampledPoint = light->sampleVisibleSurface(intersection.location);
+        Vector3 toLight = (sampledPoint - intersection.location).normalized();
+        float lightDotN = toLight.dot(intersection.normal);
 
         if (lightDotN <= 0.0f) {
             continue;
         }
 
         // Checking for occlusion between the intersection and light
-        Ray rayTowardsLight{intersection.location, -fromLight};
+        Ray rayTowardsLight{intersection.location, toLight};
         rayTowardsLight.maxDist = (sampledPoint - intersection.location).length() -
                                   Ray::MIN_RAY_DIST; // preventing auto-occlusion
 
@@ -74,8 +75,9 @@ Color Scene::computeDirectDiffuseLighting(const Intersection& intersection) cons
             continue;
         }
 
-        intersectionColor += lightDotN * intersection.material.get().color *
-                             light->computeDirectDiffuse(intersection.location, sampledPoint);
+        intersectionColor += lightDotN * material.color *
+                             light->computeDirectDiffuse(intersection.location, sampledPoint) /
+                             Utils::PI;
     }
     return intersectionColor;
 }
