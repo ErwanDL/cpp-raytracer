@@ -5,11 +5,11 @@
 #include "vector3.hpp"
 #include <cmath>
 
-struct Sample {
+struct SamplingResult {
     Vector3 direction;
     float pdf;
 
-    Sample(const Vector3& direction, float pdf) : direction(direction), pdf(pdf) {}
+    SamplingResult(const Vector3& direction, float pdf) : direction(direction), pdf(pdf) {}
 };
 
 /* Returns the given normalized vector rotated by polar angle theta and azimuth phi in its local
@@ -27,22 +27,23 @@ inline Vector3 sphericalCoordsRotation(const Vector3& zenithDirection, float the
            sinTheta * std::sin(phi) * v;
 }
 
-/* The exponent is applied to the cosine of the polar angle.
-   EDIT: This is actually a bizarre method and does not produce a cosine-weighted sampling,
+/* EDIT: This is actually a bizarre method and does not produce a cosine-weighted sampling,
    like I initially thought it did. */
-inline Vector3 sampleHemisphereDirection(const Vector3& zenithDirection, float exponent) {
+inline Vector3 sampleHemisphereGlossy(const Vector3& zenithDirection, float exponent) {
     float theta = std::acos(std::pow(Utils::random(), exponent));
     float phi = Utils::TWO_PI * Utils::random();
 
-    return sphericalCoordsRotation(zenithDirection, theta, phi);
+    Vector3 dir = sphericalCoordsRotation(zenithDirection, theta, phi);
+    return dir;
 }
 
 /* The proper way of doing cosine-weighted hemisphere sampling. */
-inline Vector3 sampleHemisphereCosineWeighted(const Vector3& zenithDirection) {
+inline SamplingResult sampleHemisphereCosineWeighted(const Vector3& zenithDirection) {
     float theta = std::asin(std::sqrt(Utils::random()));
     float phi = Utils::TWO_PI * Utils::random();
 
-    return sphericalCoordsRotation(zenithDirection, theta, phi);
+    Vector3 dir = sphericalCoordsRotation(zenithDirection, theta, phi);
+    return SamplingResult(dir, std::cos(theta) / Utils::PI);
 }
 
 inline Point3 sampleSpherePoint(const Point3& center, float radius) {

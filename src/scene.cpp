@@ -92,7 +92,7 @@ Color Scene::computeIndirectLighting(const Intersection& intersection,
             (intersection.location - observerLocation).normalized().reflected(intersection.normal);
 
         Vector3 sampledDirection =
-            sampleHemisphereDirection(perfectReflectionDirection, 1.0f / material.smoothness);
+            sampleHemisphereGlossy(perfectReflectionDirection, 1.0f / material.smoothness);
         // Reflected rays that would shoot beneath the surface are reflected about the
         // perfect reflection direction, back above the surface
         if (sampledDirection.dot(intersection.normal) < 0.0f) {
@@ -104,10 +104,12 @@ Color Scene::computeIndirectLighting(const Intersection& intersection,
         return incomingLight * (material.metal ? material.color : 1.0f);
     } else {
         // refract the ray : diffuse
-        Vector3 sampledDirection = sampleHemisphereCosineWeighted(intersection.normal);
-        Ray refractedRay{intersection.location, sampledDirection};
+        Color brdf = material.color / Utils::PI;
+        auto sample = sampleHemisphereCosineWeighted(intersection.normal);
+        Ray refractedRay{intersection.location, sample.direction};
+        float refractedDotN = sample.direction.dot(intersection.normal);
         Color incomingLight = shootRay(refractedRay, remainingBounces);
 
-        return incomingLight * material.color;
+        return incomingLight * brdf * refractedDotN / sample.pdf;
     }
 }

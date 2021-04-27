@@ -1,7 +1,5 @@
-#include <chrono>
 #include <iostream>
 #include <memory>
-#include <string>
 
 #include "camera.hpp"
 #include "intersectable.hpp"
