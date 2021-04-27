@@ -67,6 +67,10 @@ inline std::optional<std::pair<float, float>> solveSecondDegreeEquation(float a,
     float t2{(-b + std::sqrt(discriminant)) / (2 * a)};
     return std::make_pair(t1, t2);
 }
+
+inline std::pair<float, float> randomOffsetPixel(int x, int y) {
+    return {x + Utils::random() - 0.5f, y + Utils::random() - 0.5f};
+}
 } // namespace Utils
 
 #endif

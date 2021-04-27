@@ -2,7 +2,7 @@
 #include "camera.hpp"
 #include "params.hpp"
 #include "ray.hpp"
-#include "sampling_utils.hpp"
+#include "sampling.hpp"
 #include "scene.hpp"
 #include "utils.hpp"
 #include <chrono>
@@ -53,7 +53,7 @@ std::vector<std::vector<Color>> rayTrace(const PerspectiveCamera& camera, const 
         for (int x = 0; x < params.width; ++x) {
             Color pixelColor{0.0f};
             for (int i = 0; i < params.nSamples; ++i) {
-                auto sampledPixel = Utils::samplePixel(x, y); // to prevent aliasing
+                auto sampledPixel = Utils::randomOffsetPixel(x, y); // to prevent aliasing
                 Ray initialRay = camera.makeRay(sampledPixel.first, sampledPixel.second,
                                                 params.width, params.height);
                 pixelColor += scene.shootRay(initialRay, params.maxBounces, true);

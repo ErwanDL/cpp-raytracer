@@ -1,7 +1,7 @@
 #include "intersectable.hpp"
 #include "intersection.hpp"
 #include "ray.hpp"
-#include "sampling_utils.hpp"
+#include "sampling.hpp"
 #include "utils.hpp"
 #include <cmath>
 #include <optional>
@@ -20,8 +20,7 @@ std::optional<Intersection> Plane::intersect(const Ray& ray) const {
     }
 
     Point3 intersectionLocation = ray.origin + t * ray.direction.normalized();
-    Vector3 intersectionNormal = dDotN > 0.0f ? -normal : normal;
-    return Intersection(intersectionLocation, intersectionNormal, t, this->material);
+    return Intersection(intersectionLocation, normal, t, material);
 }
 
 Color Plane::computeDirectDiffuse(const Point3&, const Point3&) const {
@@ -58,14 +57,13 @@ std::optional<Intersection> Sphere::intersect(const Ray& ray) const {
 
     Point3 intersectionLocation = ray.origin + t * ray.direction.normalized();
     return Intersection(intersectionLocation, (intersectionLocation - center).normalized(), t,
-                        this->material);
+                        material);
 }
 
 Color Sphere::computeDirectDiffuse(const Point3& location, const Point3& sampledPoint) const {
     Vector3 pointToLocation = location - sampledPoint;
     Vector3 normal = (sampledPoint - center).normalized();
     float cosThetaMax = radius / (center - location).length();
-
     float pdf = 1.0f / (Utils::TWO_PI * (1.0f - cosThetaMax) * Utils::sqr(radius));
     return normal.dot(pointToLocation.normalized()) * material.emission * material.color /
            (pdf * pointToLocation.lengthSquared());
@@ -79,8 +77,7 @@ Point3 Sphere::sampleVisibleSurface(const Point3& viewer) const {
     // Uniform sampling of the visible portion of the hemisphere, delimited by angle thetaMax
     float theta = std::acos(1 - Utils::random() * (1 - cosThetaMax));
 
-    Vector3 sampledDirection =
-        Utils::sphericalCoordsRotation((viewer - center).normalized(), theta, phi);
+    Vector3 sampledDirection = sphericalCoordsRotation((viewer - center).normalized(), theta, phi);
 
     return center + radius * sampledDirection;
 }

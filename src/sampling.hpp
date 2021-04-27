@@ -4,18 +4,25 @@
 #include "utils.hpp"
 #include "vector3.hpp"
 #include <cmath>
-#include <utility>
 
-namespace Utils {
+struct Sample {
+    Vector3 direction;
+    float pdf;
+
+    Sample(const Vector3& direction, float pdf) : direction(direction), pdf(pdf) {}
+};
+
 /* Returns the given normalized vector rotated by polar angle theta and azimuth phi in its local
-spherical coordinate system. The reference for the azimuth is chosen at random, as all my sampling
-needs are isotropical for now. */
+spherical coordinate system. The reference for the azimuth is chosen at random, as all my
+sampling needs are isotropical for now. */
 inline Vector3 sphericalCoordsRotation(const Vector3& zenithDirection, float theta, float phi) {
     // One of the many ways to get an orthogonal basis from the zenith direction.
-    auto u = Vector3(-zenithDirection.y, zenithDirection.x, 0.0f).normalized();
+    float x = zenithDirection.x, y = zenithDirection.y, z = zenithDirection.z;
+    auto u = (x != 0.0f || y != 0.0f) ? Vector3(-y, x, 0.0f).normalized()
+                                      : Vector3(-z, 0.0f, x).normalized();
     auto v = zenithDirection.cross(u);
-    float sinTheta = std::sin(theta);
 
+    float sinTheta = std::sin(theta);
     return std::cos(theta) * zenithDirection + sinTheta * std::cos(phi) * u +
            sinTheta * std::sin(phi) * v;
 }
@@ -51,10 +58,5 @@ inline Point3 sampleSpherePoint(const Point3& center, float radius) {
 
     return Point3(center.x + radius * x, center.y + radius * y, center.z + radius * z);
 }
-
-inline std::pair<float, float> samplePixel(int x, int y) {
-    return {x + Utils::random() - 0.5f, y + Utils::random() - 0.5f};
-}
-} // namespace Utils
 
 #endif

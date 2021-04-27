@@ -1,6 +1,6 @@
 #include "scene.hpp"
 #include "ray.hpp"
-#include "sampling_utils.hpp"
+#include "sampling.hpp"
 #include "trace.hpp"
 #include <cmath>
 
@@ -91,8 +91,8 @@ Color Scene::computeIndirectLighting(const Intersection& intersection,
         Vector3 perfectReflectionDirection =
             (intersection.location - observerLocation).normalized().reflected(intersection.normal);
 
-        Vector3 sampledDirection = Utils::sampleHemisphereDirection(perfectReflectionDirection,
-                                                                    1.0f / material.smoothness);
+        Vector3 sampledDirection =
+            sampleHemisphereDirection(perfectReflectionDirection, 1.0f / material.smoothness);
         // Reflected rays that would shoot beneath the surface are reflected about the
         // perfect reflection direction, back above the surface
         if (sampledDirection.dot(intersection.normal) < 0.0f) {
@@ -104,7 +104,7 @@ Color Scene::computeIndirectLighting(const Intersection& intersection,
         return incomingLight * (material.metal ? material.color : 1.0f);
     } else {
         // refract the ray : diffuse
-        Vector3 sampledDirection = Utils::sampleHemisphereCosineWeighted(intersection.normal);
+        Vector3 sampledDirection = sampleHemisphereCosineWeighted(intersection.normal);
         Ray refractedRay{intersection.location, sampledDirection};
         Color incomingLight = shootRay(refractedRay, remainingBounces);
 
