@@ -7,3 +7,5 @@ build/*
 compile_commands.json
 c_cpp_properties.json
 .venv/
+*.png
+!scene.png

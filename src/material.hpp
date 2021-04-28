@@ -6,7 +6,7 @@
 
 struct Material {
     Color color;
-    // Only allowing the "default" specularity value of most diffuse materials for now.
+    // Specularity adds a lot of fireflies to the scene : removing it for diffuse materials for now.
     float specularity = 0.0f;
     float smoothness;
     bool metal;
