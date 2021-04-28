@@ -23,7 +23,8 @@ If you want to change the rendered scene, you can do so in `src/main.cpp`.
 
 ## Features supported
 
--   [x] Global illumination (path tracing, but also using direct light sampling)
--   [x] Soft shadows (non-ponctual lights)
--   [x] Single PBR Material (inspired by Disney's & Blender's Principled BSDF although much less complete)
+-   [x] Global illumination via path tracing
+-   [x] Area lights
+-   [x] PBR material (inspired by Disney's & Blender's Principled Material although much less complete) supporting diffuse, metal and emissive
 -   [x] Multithreading (using OpenMP)
+-   [x] Importance sampling (for diffuse BRDF and area light sampling)
