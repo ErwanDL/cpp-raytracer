@@ -38,7 +38,12 @@ int main() {
                                  Material::Emissive(Color(1.0f, 0.5f, 0.3f), 1.0f)),
     };
 
-    RenderParams params{720, 405, 2, 10, true};
+    int width = 720;
+    int height = 405;
+    int maxBounces = 2;
+    int spp = 10;
+    int useNextEventEstimation = true;
+    RenderParams params{width, height, maxBounces, spp, useNextEventEstimation};
 
     Scene scene{shapes, lights, params, Color(0.5f)};
 
