@@ -4,22 +4,20 @@
 #include "intersection.hpp"
 #include "material.hpp"
 #include "ray.hpp"
+#include "sampling.hpp"
 #include "vector3.hpp"
 #include <memory>
 #include <optional>
 #include <vector>
 
 class Intersectable {
-  protected:
+  public:
     Material material;
 
     Intersectable(const Material& material) : material(material) {}
 
-  public:
     virtual std::optional<Intersection> intersect(const Ray& ray) const = 0;
-    virtual Color computeDirectDiffuse(const Point3& location,
-                                       const Point3& sampledPoint) const = 0;
-    virtual Point3 sampleVisibleSurface(const Point3& viewer) const = 0;
+    virtual PointSamplingResult sampleForDirectLighting(const Point3& location) const = 0;
 };
 
 class Plane : public Intersectable {
@@ -32,8 +30,7 @@ class Plane : public Intersectable {
         : Intersectable(material), position(position), normal(normal) {}
 
     std::optional<Intersection> intersect(const Ray& ray) const override;
-    Color computeDirectDiffuse(const Point3& location, const Point3& sampledPoint) const override;
-    Point3 sampleVisibleSurface(const Point3& viewer) const override;
+    PointSamplingResult sampleForDirectLighting(const Point3& location) const override;
 };
 
 class Sphere : public Intersectable {
@@ -46,8 +43,7 @@ class Sphere : public Intersectable {
         : Intersectable(material), center(center), radius(radius) {}
 
     std::optional<Intersection> intersect(const Ray& ray) const override;
-    Color computeDirectDiffuse(const Point3& location, const Point3& sampledPoint) const override;
-    Point3 sampleVisibleSurface(const Point3& viewer) const override;
+    PointSamplingResult sampleForDirectLighting(const Point3& location) const override;
 };
 
 #endif

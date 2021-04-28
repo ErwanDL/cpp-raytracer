@@ -57,27 +57,30 @@ Color Scene::computeDirectDiffuseLighting(const Intersection& intersection) cons
         return intersectionColor;
     }
 
+    Color brdf = material.color / Utils::PI;
     for (const auto& light : lights) {
-        Point3 sampledPoint = light->sampleVisibleSurface(intersection.location);
-        Vector3 toLight = (sampledPoint - intersection.location).normalized();
-        float lightDotN = toLight.dot(intersection.normal);
+        PointSamplingResult sample = light->sampleForDirectLighting(intersection.location);
+        Vector3 toLight = sample.point - intersection.location;
+        Vector3 toLightNormalized = toLight.normalized();
+        float lightDotN = toLightNormalized.dot(intersection.normal);
 
         if (lightDotN <= 0.0f) {
             continue;
         }
 
         // Checking for occlusion between the intersection and light
-        Ray rayTowardsLight{intersection.location, toLight};
-        rayTowardsLight.maxDist = (sampledPoint - intersection.location).length() -
+        Ray rayTowardsLight{intersection.location, toLightNormalized};
+        rayTowardsLight.maxDist = (sample.point - intersection.location).length() -
                                   Ray::MIN_RAY_DIST; // preventing auto-occlusion
 
         if (findFirstIntersection(rayTowardsLight)) {
             continue;
         }
 
-        intersectionColor += lightDotN * material.color *
-                             light->computeDirectDiffuse(intersection.location, sampledPoint) /
-                             Utils::PI;
+        Color li = sample.normal.dot(-toLightNormalized) * light->material.emission *
+                   light->material.color;
+
+        intersectionColor += brdf * li * lightDotN / (sample.pdf * toLight.lengthSquared());
     }
     return intersectionColor;
 }

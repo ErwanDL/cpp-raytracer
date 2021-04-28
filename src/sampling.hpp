@@ -5,11 +5,20 @@
 #include "vector3.hpp"
 #include <cmath>
 
-struct SamplingResult {
+struct DirectionSamplingResult {
     Vector3 direction;
     float pdf;
 
-    SamplingResult(const Vector3& direction, float pdf) : direction(direction), pdf(pdf) {}
+    DirectionSamplingResult(const Vector3& direction, float pdf) : direction(direction), pdf(pdf) {}
+};
+
+struct PointSamplingResult {
+    Point3 point;
+    Vector3 normal;
+    float pdf;
+
+    PointSamplingResult(const Point3& point, Vector3 normal, float pdf)
+        : point(point), normal(normal), pdf(pdf) {}
 };
 
 /* Returns the given normalized vector rotated by polar angle theta and azimuth phi in its local
@@ -37,13 +46,19 @@ inline Vector3 sampleHemisphereGlossy(const Vector3& zenithDirection, float expo
     return dir;
 }
 
-/* The proper way of doing cosine-weighted hemisphere sampling. */
-inline SamplingResult sampleHemisphereCosineWeighted(const Vector3& zenithDirection) {
-    float theta = std::asin(std::sqrt(Utils::random()));
+/* The proper way of doing cosine-weighted hemisphere sampling.
+   You can sample only a portion of the hemisphere by providing the cosine
+   of the maximum polar angle.
+   Default value is 1 (i.e. an angle of PI/2), which corresponds to the whole hemisphere. */
+inline DirectionSamplingResult sampleHemisphereCosineWeighted(const Vector3& zenithDirection,
+                                                              float cosThetaMax = 0.0f) {
+    float sinThetaMaxSquared = 1 - Utils::sqr(cosThetaMax);
+    float theta = std::asin(std::sqrt(Utils::random() * sinThetaMaxSquared));
     float phi = Utils::TWO_PI * Utils::random();
+    float pdf = std::cos(theta) / (Utils::PI * sinThetaMaxSquared);
 
     Vector3 dir = sphericalCoordsRotation(zenithDirection, theta, phi);
-    return SamplingResult(dir, std::cos(theta) / Utils::PI);
+    return DirectionSamplingResult(dir, pdf);
 }
 
 inline Point3 sampleSpherePoint(const Point3& center, float radius) {

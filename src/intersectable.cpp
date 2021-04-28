@@ -23,14 +23,9 @@ std::optional<Intersection> Plane::intersect(const Ray& ray) const {
     return Intersection(intersectionLocation, normal, t, material);
 }
 
-Color Plane::computeDirectDiffuse(const Point3&, const Point3&) const {
+PointSamplingResult Plane::sampleForDirectLighting(const Point3&) const {
     assert(false && "Not implemented yet");
-    return Color::BLACK;
-}
-
-Point3 Plane::sampleVisibleSurface(const Point3&) const {
-    assert(false && "Not implemented yet");
-    return Point3(0.0f, 0.0f, 0.0f);
+    return PointSamplingResult(Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f), 0.0f);
 }
 
 std::optional<Intersection> Sphere::intersect(const Ray& ray) const {
@@ -60,24 +55,16 @@ std::optional<Intersection> Sphere::intersect(const Ray& ray) const {
                         material);
 }
 
-Color Sphere::computeDirectDiffuse(const Point3& location, const Point3& sampledPoint) const {
-    Vector3 pointToLocation = location - sampledPoint;
-    Vector3 normal = (sampledPoint - center).normalized();
-    float cosThetaMax = radius / (center - location).length();
-    float pdf = 1.0f / (Utils::TWO_PI * (1.0f - cosThetaMax) * Utils::sqr(radius));
-    return normal.dot(pointToLocation.normalized()) * material.emission * material.color /
-           (pdf * pointToLocation.lengthSquared());
-}
-
-Point3 Sphere::sampleVisibleSurface(const Point3& viewer) const {
-    float dToCenter = (center - viewer).length();
+PointSamplingResult Sphere::sampleForDirectLighting(const Point3& location) const {
+    Vector3 centerToLocation = location - center;
+    float dToCenter = centerToLocation.length();
     float cosThetaMax = radius / dToCenter;
 
-    float phi = Utils::TWO_PI * Utils::random();
-    // Uniform sampling of the visible portion of the hemisphere, delimited by angle thetaMax
-    float theta = std::acos(1 - Utils::random() * (1 - cosThetaMax));
+    DirectionSamplingResult sample =
+        sampleHemisphereCosineWeighted(centerToLocation.normalized(), cosThetaMax);
+    Point3 point = center + radius * sample.direction;
+    Vector3 normal = sample.direction;
 
-    Vector3 sampledDirection = sphericalCoordsRotation((viewer - center).normalized(), theta, phi);
-
-    return center + radius * sampledDirection;
+    // PDF must be divided by R² since we are not on the unit sphere anymore
+    return PointSamplingResult(point, normal, sample.pdf / Utils::sqr(radius));
 }
