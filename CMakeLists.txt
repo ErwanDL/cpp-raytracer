@@ -27,6 +27,5 @@ add_executable(raytracer ${SRC_FILES} lodepng/lodepng.cpp src/main.cpp)
 
 target_link_libraries(raytracer PRIVATE OpenMP::OpenMP_CXX)
 
+add_executable(raytracer_debug ${SRC_FILES} lodepng/lodepng.cpp src/main.cpp)
 add_executable(test ${SRC_FILES} src/test.cpp)
-
-target_link_libraries(test PRIVATE OpenMP::OpenMP_CXX)

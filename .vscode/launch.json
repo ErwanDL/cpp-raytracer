@@ -5,7 +5,7 @@
             "name": "g++ - Build and debug main",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/raytracer",
+            "program": "${workspaceFolder}/build/raytracer_debug",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -19,7 +19,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Build project",
+            "preLaunchTask": "Build for debugging",
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {

@@ -35,11 +35,15 @@ std::vector<std::vector<Color>> rayTrace(const PerspectiveCamera& camera, const 
                                          const RenderParams& params) {
     std::vector<std::vector<Color>> render(params.height);
 
+#if defined(_OPENMP)
     // This may need tweaking for optimal performance depending on your machine :
     // I noticed that using hyperthreading (all 8 logical cores) resulted in 10-15%
     // worse performance on my machine than just using the 4 physical cores.
     const int num_threads = omp_get_max_threads() / 2;
     omp_set_num_threads(num_threads);
+#else
+    const int num_threads = 1;
+#endif
 
     std::cout << "Starting render on " << num_threads << " threads..." << std::endl;
     const auto start = std::chrono::steady_clock::now();
@@ -49,7 +53,9 @@ std::vector<std::vector<Color>> rayTrace(const PerspectiveCamera& camera, const 
         std::string bar = progressBar(static_cast<float>(y) / static_cast<float>(params.height));
         std::cout << '\r' << bar << std::flush;
 
+#if defined(_OPENMP)
 #pragma omp parallel for schedule(guided)
+#endif
         for (int x = 0; x < params.width; ++x) {
             Color pixelColor{0.0f};
             for (int i = 0; i < params.nSamples; ++i) {

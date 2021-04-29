@@ -10,6 +10,12 @@
             "group": "build"
         },
         {
+            "label": "Build for debugging",
+            "type": "shell",
+            "command": "cd build && make raytracer_debug",
+            "group": "build"
+        },
+        {
             "label": "Build & Run project",
             "type": "shell",
             "dependsOn": [
