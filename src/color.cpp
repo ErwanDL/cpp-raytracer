@@ -3,7 +3,9 @@
 Color Color::WHITE = Color(1.0f);
 Color Color::BLACK = Color(0.0f);
 
-Color Color::clamped() const { return Color(Utils::clamp(r), Utils::clamp(g), Utils::clamp(b)); }
+Color Color::clamped(float max) const {
+    return Color(Utils::clamp(r, max), Utils::clamp(g, max), Utils::clamp(b, max));
+}
 
 Color operator*(const Color& c1, const Color& c2) {
     return Color(c1.r * c2.r, c1.g * c2.g, c1.b * c2.b);
@@ -33,3 +35,5 @@ bool Color::operator==(const Color& other) const {
     return Utils::floatingPointEquality(r, other.r) && Utils::floatingPointEquality(g, other.g) &&
            Utils::floatingPointEquality(b, other.b);
 }
+
+bool Color::operator!=(const Color& other) const { return !(other == *this); }

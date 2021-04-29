@@ -23,7 +23,7 @@ class PerspectiveCamera {
         float u = 2.0f * (x - static_cast<float>(width) / 2.0f) / height;
         float v = 2.0f * (static_cast<float>(height) / 2.0f - y) / height;
         Vector3 direction{forward + u * maxV * right + v * up * maxV};
-        return Ray(location, direction);
+        return Ray(location, direction.normalized());
     }
 };
 

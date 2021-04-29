@@ -15,11 +15,12 @@ struct Color {
     Color(float f) : r(f), g(f), b(f) {}
     Color(float red, float green, float blue) : r(red), g(green), b(blue) {}
 
-    Color clamped() const;
+    Color clamped(float max = 1.0f) const;
 
     Color& operator+=(const Color& other);
     Color& operator/=(float f);
     bool operator==(const Color& other) const;
+    bool operator!=(const Color& other) const;
 };
 
 Color operator*(const Color& c1, const Color& c2);

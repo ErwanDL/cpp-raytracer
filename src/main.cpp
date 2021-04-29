@@ -11,7 +11,7 @@
 #include "vector3.hpp"
 
 int main() {
-    Material wallMat{Material::Diffuse(0.9f)};
+    Material wallMat{Material::Diffuse(Color(0.9f))};
     std::vector<std::shared_ptr<Intersectable>> shapes{
         std::make_shared<Plane>(Point3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0, 0.0f), // floor
                                 wallMat),
@@ -23,27 +23,30 @@ int main() {
                                 Material::Diffuse(Color(0.9f, 0.3f, 0.3f))),
         std::make_shared<Plane>(Point3(2.0f, 0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f), // right
                                 Material::Diffuse(Color(0.3f, 0.9f, 0.3f))),
-        std::make_shared<Sphere>(Point3(-0.7f, 0.5f, -6.0f), 0.5f, // glossy sphere
-                                 Material::Metal(Color(0.9f, 0.6f, 0.4f), 25.0f)),
-        std::make_shared<Sphere>(Point3(-0.9f, 1.0f, -8.5f), 1.0f, // diffuse sphere
-                                 Material::Diffuse(Color(0.3, 0.4f, 0.9f), 1000.0f)),
-        std::make_shared<Sphere>(Point3(0.8f, 1.0f, -7.0f), 1.0f, // mirror sphere
+        std::make_shared<Sphere>(Point3(-0.9f, 1.0f, -8.9f), 1.0f, // Diffuse sphere
+                                 Material::Diffuse(Color(0.2f, 0.3f, 0.9f))),
+        std::make_shared<Sphere>(Point3(1.0f, 0.9f, -8.0f), 0.9f, // Mirror sphere
                                  Material::Metal(Color(0.7f), 10'000.0f)),
+        std::make_shared<Sphere>(Point3(0.2f, 0.5f, -6.5f), 0.5f, // Glass sphere
+                                 Material::Refractive(Color::WHITE)),
+        std::make_shared<Sphere>(Point3(-1.2f, 0.6f, -6.7f), 0.6f, // Glossy sphere
+                                 Material::Metal(Color(0.9f, 0.6f, 0.4f), 25.0f)),
     };
 
     std::vector<std::shared_ptr<Intersectable>> lights{
-        std::make_shared<Sphere>(Point3(0.0f, 3.3f, -8.0f), 0.5f,
-                                 Material::Emissive(Color(1.0f, 1.0f, 0.9f), 2.0f)),
-        std::make_shared<Sphere>(Point3(0.8f, 0.5f, -5.7f), 0.5f,
+        std::make_shared<Sphere>(Point3(0.0f, 3.8f, -8.0f), 0.2f,
+                                 Material::Emissive(Color(1.0f, 1.0f, 0.9f), 16.0f)),
+        std::make_shared<Sphere>(Point3(1.2f, 0.3f, -5.7f), 0.3f,
                                  Material::Emissive(Color(1.0f, 0.5f, 0.3f), 1.0f)),
     };
 
     int width = 720;
     int height = 405;
-    int maxBounces = 2;
-    int spp = 10;
-    bool useNextEventEstimation = true;
-    RenderParams params{width, height, maxBounces, spp, useNextEventEstimation};
+    int maxBounces = 10;
+    int spp = 40;
+    bool nextEventEstimation = true;
+    bool firefliesClamping = true;
+    RenderParams params{width, height, maxBounces, spp, nextEventEstimation, firefliesClamping};
 
     Scene scene{shapes, lights, params, Color::BLACK};
 

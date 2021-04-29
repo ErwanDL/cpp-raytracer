@@ -1,6 +1,5 @@
 #include "scene.hpp"
 #include "ray.hpp"
-#include "sampling.hpp"
 #include "trace.hpp"
 #include <cmath>
 
@@ -13,24 +12,31 @@ Color Scene::shootRay(const Ray& ray, int remainingBounces, bool isCameraRay) co
 
     const Intersection& intersection = optIntersection.value();
     const Material& material = intersection.material.get();
+    Color irradiance;
+    bool clampIrradiance = (params.firefliesClamping && isCameraRay);
 
-    if (material.emission > 0.0f) { // If hit object is a light
-        // If camera ray : clamp value (to prevent aliasing) and terminate path.
-        if (isCameraRay) {
-            return (material.color * material.emission).clamped();
+    if (material.type == MaterialType::Emissive) {
+        Color li = material.color * material.emission;
+
+        // If nextEventEstimation is activated and the ray comes from diffuse reflection, we
+        // don't want to "double dip", i.e. count the direct diffuse lighting twice.
+        irradiance = (params.nextEventEstimation && ray.isDiffuse) ? Color::BLACK : li;
+
+        // We always want to clamp camera rays directly on lights to prevent aliasing.
+        clampIrradiance = clampIrradiance || isCameraRay;
+    } else {
+        Color direct = (params.nextEventEstimation && material.type == MaterialType::Diffuse)
+                           ? computeDirectDiffuseLighting(intersection)
+                           : Color::BLACK;
+        irradiance = direct;
+        if (remainingBounces > 0) {
+            auto [nextRay, attenuation] = reflectOrRefract(intersection, ray.origin);
+            Color indirect = attenuation * shootRay(nextRay, remainingBounces - 1);
+            irradiance += indirect;
         }
-        // With NEE activated, we want to avoid counting direct diffuse lighting twice.
-        return (ray.isSpecular || !params.nextEventEstimation) * material.color * material.emission;
     }
 
-    Color direct =
-        params.nextEventEstimation ? computeDirectDiffuseLighting(intersection) : Color::BLACK;
-
-    if (remainingBounces == 0) {
-        return direct;
-    }
-
-    return direct + computeIndirectLighting(intersection, ray.origin, remainingBounces - 1);
+    return clampIrradiance ? irradiance.clamped() : irradiance;
 }
 
 std::optional<Intersection> Scene::findFirstIntersection(const Ray& ray) const {
@@ -51,11 +57,6 @@ std::optional<Intersection> Scene::findFirstIntersection(const Ray& ray) const {
 Color Scene::computeDirectDiffuseLighting(const Intersection& intersection) const {
     Color intersectionColor{0.0f};
     const Material& material = intersection.material.get();
-
-    // Metals have no diffuse component.
-    if (material.metal) {
-        return intersectionColor;
-    }
 
     Color brdf = material.color / Utils::PI;
     for (const auto& light : lights) {
@@ -83,36 +84,4 @@ Color Scene::computeDirectDiffuseLighting(const Intersection& intersection) cons
         intersectionColor += brdf * li * lightDotN / (sample.pdf * toLight.lengthSquared());
     }
     return intersectionColor;
-}
-
-Color Scene::computeIndirectLighting(const Intersection& intersection,
-                                     const Point3& observerLocation, int remainingBounces) const {
-    const Material& material = intersection.material;
-
-    if (material.metal || Utils::random() <= material.specularity) {
-        // reflect the ray : specular
-        Vector3 perfectReflectionDirection =
-            (intersection.location - observerLocation).normalized().reflected(intersection.normal);
-
-        Vector3 sampledDirection =
-            sampleHemisphereGlossy(perfectReflectionDirection, 1.0f / material.smoothness);
-        // Reflected rays that would shoot beneath the surface are reflected about the
-        // perfect reflection direction, back above the surface
-        if (sampledDirection.dot(intersection.normal) < 0.0f) {
-            sampledDirection = (-sampledDirection).reflected(perfectReflectionDirection);
-        }
-        Ray reflectedRay{intersection.location, sampledDirection, true};
-        Color incomingLight = shootRay(reflectedRay, remainingBounces);
-
-        return incomingLight * (material.metal ? material.color : 1.0f);
-    } else {
-        // refract the ray : diffuse
-        Color brdf = material.color / Utils::PI;
-        auto sample = sampleHemisphereCosineWeighted(intersection.normal);
-        Ray refractedRay{intersection.location, sample.direction};
-        float refractedDotN = sample.direction.dot(intersection.normal);
-        Color incomingLight = shootRay(refractedRay, remainingBounces);
-
-        return incomingLight * brdf * refractedDotN / sample.pdf;
-    }
 }

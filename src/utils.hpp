@@ -50,7 +50,7 @@ inline bool floatingPointEquality(float a, float b) {
     return (diff <= (std::max(std::abs(a), std::abs(b)) * relEpsilon));
 }
 
-inline float clamp(float x, float min = 0.0f, float max = 1.0f) { return std::clamp(x, min, max); }
+inline float clamp(float x, float max = 1.0f, float min = 0.0f) { return std::clamp(x, min, max); }
 
 /*
  * Returns false if the equation has no solution, returns a pair (t1, t2) with

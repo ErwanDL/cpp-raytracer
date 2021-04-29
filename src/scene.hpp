@@ -31,9 +31,6 @@ class Scene {
 
   private:
     Color computeDirectDiffuseLighting(const Intersection& intersection) const;
-
-    Color computeIndirectLighting(const Intersection& intersection, const Point3& observerLocation,
-                                  int remainingBounces) const;
 };
 
 #endif

@@ -25,6 +25,7 @@ If you want to change the rendered scene, you can do so in `src/main.cpp`.
 
 -   [x] Global illumination via path tracing
 -   [x] Area lights
--   [x] PBR material (inspired by Disney's & Blender's Principled Material although much less complete) supporting diffuse, metal and emissive
+-   [x] PBR material (inspired by Disney's & Blender's Principled Material although much less complete) supporting diffuse, metal, refractive and emissive
 -   [x] Multithreading (using OpenMP)
 -   [x] Importance sampling (for diffuse BRDF and area light sampling)
+-   [x] Firefly removal

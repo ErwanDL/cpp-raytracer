@@ -19,8 +19,10 @@ std::optional<Intersection> Plane::intersect(const Ray& ray) const {
         return {};
     }
 
+    bool backFace = dDotN > 0.0f;
+
     Point3 intersectionLocation = ray.origin + t * ray.direction.normalized();
-    return Intersection(intersectionLocation, normal, t, material);
+    return Intersection(intersectionLocation, backFace ? -normal : normal, t, material, backFace);
 }
 
 PointSamplingResult Plane::sampleForDirectLighting(const Point3&) const {
@@ -41,18 +43,21 @@ std::optional<Intersection> Sphere::intersect(const Ray& ray) const {
     }
 
     float t;
+    bool backFace;
     // since t1 always <= t2, we check t1 first
     if (ray.isValidRayDistance(solutions->first)) {
         t = solutions->first;
+        backFace = false;
     } else if (ray.isValidRayDistance(solutions->second)) {
         t = solutions->second;
+        backFace = true;
     } else {
         return {};
     }
 
     Point3 intersectionLocation = ray.origin + t * ray.direction.normalized();
     return Intersection(intersectionLocation, (intersectionLocation - center).normalized(), t,
-                        material);
+                        material, backFace);
 }
 
 PointSamplingResult Sphere::sampleForDirectLighting(const Point3& location) const {
